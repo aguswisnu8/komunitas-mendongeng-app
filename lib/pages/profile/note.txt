@@ -1,0 +1,53 @@
+// user
+        // 'name',
+        // 'email',
+        // 'level',
+        // 'active',
+        // 'alamat',
+        // 'medsos',
+        // 'deskripsi',
+        // 'exp',
+        // 'password',
+        // 'profile_photo_path',
+
+
+// mendongeng
+                // 'name',
+                // 'lokasi',
+                // 'tgl',
+                // 'deskripsi',
+        // 'gambar',
+                // 'partner',
+                // 'jenis',
+                // 'status',
+                // 'gmap_link',
+        // 'udangan_id',
+        // 'exp_req',
+        // 'st_req',
+
+// konten
+        // 'judul',
+        // 'gambar',
+        // 'link',
+        // 'deskripsi',
+        // 'jenis',
+        // 'jenis',
+        // 'status',
+        // 'user_id',
+
+// undagan
+        // 'user_id',
+        // 'pengirim',
+        // 'nm_kegiatan',
+        // 'lokasi',
+        // 'tgl',
+        // 'deskripsi',
+        // 'jenis',
+        // 'penyelenggara',
+        // 'contact',
+        // 'status',
+
+// partispan
+        // 'user_id',
+        // 'mendongeng_id',
+        // 'peran',
