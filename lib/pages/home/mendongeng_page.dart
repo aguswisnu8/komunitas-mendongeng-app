@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/pages/widget/mendongeng_card.dart';
 import 'package:kom_mendongeng/pages/widget/mendongeng_tile.dart';
+import 'package:kom_mendongeng/providers/mendongeng_provider.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class MendongengPage extends StatefulWidget {
   @override
@@ -9,9 +12,11 @@ class MendongengPage extends StatefulWidget {
 }
 
 class _MendongengPageState extends State<MendongengPage> {
-  // const MendongengPage({ Key? key }) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    MendongengProvider mendongengProvider =
+        Provider.of<MendongengProvider>(context);
+
     Widget header() {
       return SliverAppBar(
         backgroundColor: secondaryColor,
@@ -43,9 +48,9 @@ class _MendongengPageState extends State<MendongengPage> {
             Text(
               'Mendongeng Keliling, merupakan sebuah kegiatan yang dilakukan oleh para sukarelawan untuk mengadakan pentas dongeng di suatu tempat. Biasanya kegiatan ini dilakukan dari permintaan masyarakat untuk mendongeng di acara mereka, seperti mendongeng di sekolah-sekolah, acara penggalangan dana, acara di sebuah mall, bahkan ada masyarakat yang mengundang pada acara ulang tahun anak mereka.',
               style: greyTextStyle.copyWith(
-                // fontWeight: medium,
-                // fontSize: 16,
-              ),
+                  // fontWeight: medium,
+                  // fontSize: 16,
+                  ),
               textAlign: TextAlign.center,
             ),
             SizedBox(
@@ -110,13 +115,31 @@ class _MendongengPageState extends State<MendongengPage> {
       body: ListView(
         children: [
           akanDatang(),
-          MendongengCard(),
-          MendongengCard(),
+          Column(
+            children: mendongengProvider.mendongengs
+                .map(
+                  (mendongeng) => commingDay(mendongeng.tgl.toString())
+                      ? MendongengCard(mendongeng)
+                      : SizedBox(),
+                )
+                .toList(),
+          ),
+          // MendongengCard(),
+          // MendongengCard(),
           sudahDilakukan(),
-          MendongengCard(),
-          MendongengCard(),
-          MendongengCard(),
-          MendongengCard(),
+          Column(
+            children: mendongengProvider.mendongengs
+                .map(
+                  (mendongeng) => pastDay(mendongeng.tgl.toString())
+                      ? MendongengCard(mendongeng)
+                      : SizedBox(),
+                )
+                .toList(),
+          ),
+          // MendongengCard(),
+          // MendongengCard(),
+          // MendongengCard(),
+          // MendongengCard(),
         ],
       ),
     );

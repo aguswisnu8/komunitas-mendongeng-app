@@ -1,0 +1,78 @@
+response regis dan login
+
+"id": 2,
+"name": "Agus Wisnu",
+"email": "aguswisnu@gg.gg",
+"exp": 1,
+"deskripsi": null,
+"medsos": null,
+"alamat": null,
+"active": 1,
+"level": "anggota",
+"profile_photo_path": 
+
+
+response anggota
+"id": 1,
+"name": "GGWP",
+"email": "gg@gg.gg",
+"exp": 1,
+"deskripsi": null,
+"medsos": null,
+"alamat": null,
+"active": 1,
+"level": "admin",
+"profile_photo_path": "http://192.168.47.239/storage",
+
+
+response undangan 
+
+"id": 1,
+"user_id": 4,
+"pengirim": "Agus Wisnu",
+"nm_kegiatan": "Mendongeng Bersama Kak Agus",
+"lokasi": "Rumah",
+"tgl": "2022-01-01",
+"deskripsi": "Kak Agus akan menceritakan legenda monkey d luffy",
+"jenis": "baksos",
+"penyelenggara": "Persatuan One Piece Seluruh Punggul",
+"contact": "081234567890",
+"status": "tunggu",
+"user": {
+
+response mendongeng
+"id": 1,
+"name": "123wqe",
+"lokasi": "qweq",
+"tgl": "2022-02-10",
+"deskripsi": "qweqe",
+"gambar": "http://192.168.43.239/storage",
+"partner": "qwe",
+"jenis": "korporat",
+"status": 1,
+"gmap_link": null,
+"udangan_id": null,
+"exp_req": 1,
+"st_req": 1,
+"undangan": null
+ 
+ response konten
+
+"id": 1,
+"judul": "Ayo Mendongeng",
+"gambar": "http://192.168.43.239/storage/konten/qSAT06Jv3twejooAPOdSaLv3zUJtIgNXzVfz9vjE.png",
+"link": "12345678",
+"deskripsi": "Bali Mendongeng",
+"jenis": "artikel",
+"status": 1,
+"user_id": 3,
+"user": {
+
+ response partisipan
+
+"id": 1,
+"user_id": 3,
+"mendongeng_id": 1,
+"peran": "pendongeng",
+"user": {
+"mendongeng": {

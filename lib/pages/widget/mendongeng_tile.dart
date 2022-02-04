@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/mendongeng_model.dart';
+import 'package:kom_mendongeng/pages/detail_mendongeng_page.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
 
 class MendongengTile extends StatelessWidget {
+  late final MendongengModel mendongeng;
+  MendongengTile(this.mendongeng);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/d-mendongeng');
+        // Navigator.pushNamed(context, '/d-mendongeng');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailMendongengPage(mendongeng),
+          ),
+        );
       },
       child: Container(
         width: 320,
@@ -17,25 +29,35 @@ class MendongengTile extends StatelessWidget {
         ),
         child: Column(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              child: Image.asset(
-                'assets/image_test.jpg',
-                width: 320,
-                height: 180,
-                fit: BoxFit.cover,
-              ),
-            ),
+            cekImage(mendongeng.gambar.toString())
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      mendongeng.gambar.toString(),
+                      width: 320,
+                      height: 180,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    child: Image.asset(
+                      'assets/image_test.jpg',
+                      width: 320,
+                      height: 180,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '2022-02-14 - Punggul qweqweqweqweqweqwe',
+                    '${mendongeng.tgl} - ${mendongeng.lokasi}',
                     overflow: TextOverflow.ellipsis,
                     style: blackTextStyle.copyWith(
                       fontWeight: medium,
@@ -45,7 +67,7 @@ class MendongengTile extends StatelessWidget {
                     height: 2,
                   ),
                   Text(
-                    'Mendongeng Bersama Punggul',
+                    '${mendongeng.name}',
                     style: blackTextStyle.copyWith(
                       fontWeight: semiBold,
                       fontSize: 18,

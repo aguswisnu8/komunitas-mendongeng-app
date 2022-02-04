@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/api_config.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -7,10 +12,23 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool flag = true;
-
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserModel user;
+
+    String level = 'anggota';
+    String? name;
+    String? email;
+    bool flag = authProvider.logged;
+
+    if (flag) {
+      user = authProvider.user;
+      level = user.level.toString();
+      name = user.name;
+      email = user.email;
+    }
+
     Widget header() {
       return AppBar(
         backgroundColor: primaryColor,
@@ -35,12 +53,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hallo, Agus Wisnu Kusuma Nata',
+                        // 'Hallo, Agus Wisnu Kusuma Nata',
+                        'Hallo, ${name}',
                         style: whiteTextStyle.copyWith(
                             fontSize: 18, fontWeight: semiBold),
                       ),
                       Text(
-                        'aguswisnu8@gmail.com',
+                        // 'aguswisnu8@gmail.com',
+                        '${email}',
                         style: whiteTextStyle.copyWith(),
                       ),
                     ],
@@ -49,7 +69,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      flag = false;
+                      // flag = false;
+
+                      authProvider.logStatus(false);
                     });
                   },
                   child: Icon(
@@ -101,50 +123,8 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(
                 height: 20,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Account',
-                    style: blackTextStyle.copyWith(
-                      fontSize: 16,
-                      fontWeight: semiBold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/p-edit');
-                    },
-                    child: menuItem('Edit Profile'),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/p-resetpass');
-                    },
-                    child: menuItem('Reset Password'),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/p-userkonten');
-                    },
-                    child: menuItem('Konten'),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/p-userundangan');
-                    },
-                    child: menuItem('Undangan'),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                ],
-              ),
               Text(
-                'Pengelolaan Admin',
+                'Account',
                 style: blackTextStyle.copyWith(
                   fontSize: 16,
                   fontWeight: semiBold,
@@ -155,34 +135,80 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/a-akun');
+                  Navigator.pushNamed(context, '/p-edit');
                 },
-                child: menuItem('Akun'),
+                child: menuItem('Edit Profile'),
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/a-mendongeng');
+                  Navigator.pushNamed(context, '/p-resetpass');
                 },
-                child: menuItem('Kegitan Mendongeng'),
+                child: menuItem('Reset Password'),
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/a-partisipan');
-                },
-                child: menuItem('Partispan'),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, '/a-konten');
+                  Navigator.pushNamed(context, '/p-userkonten');
                 },
                 child: menuItem('Konten'),
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/a-undangan');
+                  Navigator.pushNamed(context, '/p-userundangan');
                 },
                 child: menuItem('Undangan'),
               ),
+              SizedBox(
+                height: 16,
+              ),
+              level == 'admin'
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pengelolaan Admin',
+                          style: blackTextStyle.copyWith(
+                            fontSize: 16,
+                            fontWeight: semiBold,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/a-akun');
+                          },
+                          child: menuItem('Akun'),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/a-mendongeng');
+                          },
+                          child: menuItem('Kegitan Mendongeng'),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/a-partisipan');
+                          },
+                          child: menuItem('Partispan'),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/a-konten');
+                          },
+                          child: menuItem('Konten'),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/a-undangan');
+                          },
+                          child: menuItem('Undangan'),
+                        ),
+                      ],
+                    )
+                  : SizedBox(
+                      height: 2,
+                    ),
             ],
           ),
         ),
@@ -191,7 +217,6 @@ class _ProfilePageState extends State<ProfilePage> {
     // Widget login(){
     //   return
     // }
-
 
     Widget auth() {
       return Column(
@@ -222,7 +247,9 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 44,
             child: TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/daftar');
+                Navigator.pushNamed(context, '/daftar').then((value) {
+                  setState(() {});
+                });
               },
               child: Text(
                 'Daftar Anggota',
@@ -248,7 +275,9 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 44,
             child: TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/login');
+                Navigator.pushNamed(context, '/login').then((value) {
+                  setState(() {});
+                });
               },
               child: Text(
                 'Login',
@@ -270,32 +299,34 @@ class _ProfilePageState extends State<ProfilePage> {
           SizedBox(
             height: 12,
           ),
-          Container(
-            height: 44,
-            child: TextButton(
-              onPressed: () {
-                // Navigator.pushNamed(context, '/login');
-                setState(() {
-                  flag = true;
-                });
-              },
-              child: Text(
-                'Halaman Profile',
-                style:
-                    whiteTextStyle.copyWith(fontSize: 16, fontWeight: medium),
-              ),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 24,
-                ),
-                backgroundColor: secondaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
+          // Container(
+          //   height: 44,
+          //   child: TextButton(
+          //     onPressed: () {
+          //       // apiTest();
+          //       // Navigator.pushNamed(context, '/login');
+          //       setState(() {
+          //         // flag = true;
+          //         authProvider.logStatus(true);
+          //       });
+          //     },
+          //     child: Text(
+          //       'Halaman Profile',
+          //       style:
+          //           whiteTextStyle.copyWith(fontSize: 16, fontWeight: medium),
+          //     ),
+          //     style: TextButton.styleFrom(
+          //       padding: EdgeInsets.symmetric(
+          //         vertical: 10,
+          //         horizontal: 24,
+          //       ),
+          //       backgroundColor: Colors.blueAccent,
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(12),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       );
     }
@@ -312,5 +343,21 @@ class _ProfilePageState extends State<ProfilePage> {
     return Center(
       child: flag ? logged() : auth(),
     );
+  }
+
+  Future apiTest() async {
+    print('test api');
+    var baseUrl = '${ApiConfig.getUrl()}/test/';
+    final response = await http.get(
+      Uri.parse(baseUrl),
+      headers: {'Accept': 'application/json'},
+    );
+    if (response.statusCode == 200) {
+      print('Api Berhasil');
+      print(response.body);
+    } else {
+      print(response.body);
+      print('Api Gagal');
+    }
   }
 }

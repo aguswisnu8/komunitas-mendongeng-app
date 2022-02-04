@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/mendongeng_model.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class DetailMendongengPage extends StatelessWidget {
+class DetailMendongengPage extends StatefulWidget {
+  late final MendongengModel mendongeng;
+  DetailMendongengPage(this.mendongeng);
+
+  @override
+  State<DetailMendongengPage> createState() => _DetailMendongengPageState();
+}
+
+class _DetailMendongengPageState extends State<DetailMendongengPage> {
   @override
   Widget build(BuildContext context) {
+    _launchURL(String url) async {
+      if (await canLaunch(url)) {
+        await launch(url);
+        print('berhasil');
+      } else {
+        // throw 'Could not launch $url';
+        print('gagal');
+      }
+    }
+
     Widget header() {
       return Column(
         children: [
@@ -16,9 +37,16 @@ class DetailMendongengPage extends StatelessWidget {
               right: defaultMargin,
             ),
             decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/image_test.jpg'),
-                  fit: BoxFit.cover),
+              image: cekImage(widget.mendongeng.gambar.toString())
+                  ? DecorationImage(
+                      // image: AssetImage('assets/image_test.jpg'),
+                      image: NetworkImage(widget.mendongeng.gambar.toString()),
+                      fit: BoxFit.cover,
+                    )
+                  : DecorationImage(
+                      image: AssetImage('assets/image_test.jpg'),
+                      fit: BoxFit.cover,
+                    ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -56,7 +84,8 @@ class DetailMendongengPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Mendongeng Di SD 1 Punggul',
+              '${widget.mendongeng.name}',
+              // 'Mendongeng Di SD 1 Punggul',
               style: blackTextStyle.copyWith(
                 fontSize: 24,
                 fontWeight: semiBold,
@@ -66,22 +95,49 @@ class DetailMendongengPage extends StatelessWidget {
               height: 2,
             ),
             Text(
-              '2022-02-22',
+              '${widget.mendongeng.tgl}',
+              // '2022-02-22',
               style: greyTextStyle,
             ),
             SizedBox(
               height: 2,
             ),
             Text(
-              'Jalan Raya Punggul',
-              style: greyTextStyle,
+              '${widget.mendongeng.lokasi}',
+              // 'Jalan Raya Punggul',
+              style: greyTextStyle.copyWith(fontSize: 16),
             ),
+            widget.mendongeng.gmapLink.toString().length >= 10
+                ? GestureDetector(
+                    onTap: () {
+                      _launchURL('${widget.mendongeng.gmapLink}');
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Google Map',
+                          style: greyTextStyle.copyWith(color: primaryColor),
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Icon(
+                          Icons.location_on_sharp,
+                          color: primaryColor,
+                          // size: 40,
+                        ),
+                      ],
+                    ),
+                  )
+                : SizedBox(),
             Divider(
               thickness: 1,
             ),
             Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor.',
-              style: greyTextStyle.copyWith(fontSize: 16),
+              '${widget.mendongeng.deskripsi}',
+              // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor.',
+              style: greyTextStyle.copyWith(fontSize: 18),
             ),
           ],
         ),
@@ -247,7 +303,9 @@ class DetailMendongengPage extends StatelessWidget {
         children: [
           header(),
           content(),
-          buttonIkut(),
+          commingDay(widget.mendongeng.tgl.toString())
+              ? buttonIkut()
+              : SizedBox(),
         ],
       ),
     );

@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/konten_model.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailKontenPage extends StatefulWidget {
+  late final KontenModel konten;
+  DetailKontenPage(this.konten);
+
   @override
   State<DetailKontenPage> createState() => _DetailKontenPageState();
 }
 
 class _DetailKontenPageState extends State<DetailKontenPage> {
-  String? videoId = YoutubePlayer.convertUrlToId(
-      'https://www.youtube.com/watch?v=nqfVoTMEosw');
-
-  // YoutubePlayerController _controller = YoutubePlayerController(
-  //   initialVideoId: 'nqfVoTMEosw',
-  //   flags: YoutubePlayerFlags(
-  //     autoPlay: true,
-  //     mute: false,
-  //   ),
-  // );
+  // String? videoId = YoutubePlayer.convertUrlToId(
+  //     'https://www.youtube.com/watch?v=nqfVoTMEosw');
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +29,7 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
       }
     }
 
-    print(videoId);
+    // print(videoId);
     Widget header() {
       return Column(
         children: [
@@ -72,10 +69,15 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
       return Center(
         child: Container(
           margin: EdgeInsets.all(16),
-          child: Image(
-            image: AssetImage('assets/image_test.jpg'),
-            height: 200,
-          ),
+          child: cekImage(widget.konten.gambar.toString())
+              ? Image(
+                  image: NetworkImage(widget.konten.gambar.toString()),
+                  height: 200,
+                )
+              : Image(
+                  image: AssetImage('assets/image_test.jpg'),
+                  height: 200,
+                ),
         ),
       );
     }
@@ -92,7 +94,10 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
             children: [
               YoutubePlayer(
                 controller: YoutubePlayerController(
-                  initialVideoId: videoId.toString(),
+                  initialVideoId:
+                      YoutubePlayer.convertUrlToId('${widget.konten.link}')
+                          .toString(),
+                  // initialVideoId: videoId.toString(),
                   flags: YoutubePlayerFlags(
                     hideControls: false,
                     controlsVisibleAtStart: true,
@@ -110,7 +115,8 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  _launchURL('https://www.youtube.com/watch?v=nqfVoTMEosw');
+                  _launchURL('${widget.konten.link}');
+                  // _launchURL('https://www.youtube.com/watch?v=nqfVoTMEosw');
                 },
                 child: Row(
                   // crossAxisAlignment: CrossAxisAlignment.center,
@@ -131,8 +137,6 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
               SizedBox(
                 height: 2,
               ),
-
-
             ],
           ),
         ),
@@ -150,7 +154,7 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Si Kancil yang Nakal',
+              '${widget.konten.judul}',
               style: blackTextStyle.copyWith(
                 fontSize: 24,
                 fontWeight: semiBold,
@@ -160,22 +164,25 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
               height: 2,
             ),
             Text(
-              'artikel dongeng',
+              '${widget.konten.jenis} dongeng',
+              // 'artikel dongeng',
               style: greyTextStyle,
             ),
             SizedBox(
               height: 2,
             ),
             Text(
-              'Oleh: agus wisnu dan kusuma nata',
+              'Oleh: ${widget.konten.user?.name}',
+              // 'Oleh: agus wisnu dan kusuma nata',
               style: greyTextStyle,
             ),
             Divider(
               thickness: 1,
             ),
             Text(
-              'Pada suatu saat, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor.',
-              style: greyTextStyle.copyWith(fontSize: 16),
+              '${widget.konten.deskripsi}',
+              // 'Pada suatu saat, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor.',
+              style: greyTextStyle.copyWith(fontSize: 18),
             ),
           ],
         ),
@@ -186,8 +193,7 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
       body: ListView(
         children: [
           header(),
-          kontenImage(),
-          kontenVideo(),
+          widget.konten.jenis == 'video' ? kontenVideo() : kontenImage(),
           content(),
           SizedBox(
             height: defaultMargin,

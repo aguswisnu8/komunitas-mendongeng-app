@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/pages/widget/konten_tile.dart';
+
+import 'package:kom_mendongeng/providers/konten_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class KontenPage extends StatelessWidget {
   // const MendongengPage({ Key? key }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
     Widget header() {
       return SliverAppBar(
         backgroundColor: secondaryColor,
@@ -60,12 +64,17 @@ class KontenPage extends StatelessWidget {
       body: ListView(
         children: [
           subTitle(),
-          KontenTile(),
-          KontenTile(),
-          KontenTile(),
-          KontenTile(),
-          KontenTile(),
-          KontenTile(),
+          Column(
+            children: kontenProvider.kontens
+                .map((konten) => KontenTile(konten))
+                .toList(),
+          ),
+          // KontenTile(),
+          // KontenTile(),
+          // KontenTile(),
+          // KontenTile(),
+          // KontenTile(),
+          // KontenTile(),
           SizedBox(
             height: defaultMargin,
           ),

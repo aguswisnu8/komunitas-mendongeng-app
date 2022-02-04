@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/pages/widget/konten_tile.dart';
 import 'package:kom_mendongeng/pages/widget/mendongeng_tile.dart';
+import 'package:kom_mendongeng/providers/konten_provider.dart';
+import 'package:kom_mendongeng/providers/mendongeng_provider.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
-  // const MendongengPage({ Key? key }) : super(key: key);
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    MendongengProvider mendongengProvider =
+        Provider.of<MendongengProvider>(context);
+
+    KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+
     Widget header() {
       return Container(
         decoration: BoxDecoration(
@@ -90,9 +102,29 @@ class HomePage extends StatelessWidget {
                   SizedBox(
                     width: 16,
                   ),
-                  MendongengTile(),
-                  MendongengTile(),
-                  MendongengTile(),
+                  Row(
+                    // children: mendongengProvider.mendongengs
+                    //     .map(
+                    //       (mendongeng) => MendongengTile(),
+                    //     )
+                    //     .toList(),
+                    children: mendongengProvider.mendongengs
+                        .map(
+                          (mendongeng) => commingDay(mendongeng.tgl.toString())
+                              ? MendongengTile(mendongeng)
+                              : SizedBox(),
+                        )
+                        .toList(),
+
+                    // children: [
+                    //   SizedBox(
+                    //     width: 16,
+                    //   ),
+                    //   MendongengTile(),
+                    //   MendongengTile(),
+                    //   MendongengTile(),
+                    // ],
+                  ),
                 ],
               ),
             ),
@@ -135,11 +167,16 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       color: secondaryColor,
                     ),
-                    child: Text(
-                      'telusuri',
-                      style: whiteTextStyle.copyWith(
-                        fontSize: 16,
-                        fontWeight: medium,
+                    child: GestureDetector(
+                      onTap: () {
+                        print(commingDay('2022-03'));
+                      },
+                      child: Text(
+                        'telusuri',
+                        style: whiteTextStyle.copyWith(
+                          fontSize: 16,
+                          fontWeight: medium,
+                        ),
                       ),
                     ),
                   ),
@@ -154,11 +191,20 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   width: 16,
                 ),
-                KontenTile(),
-                KontenTile(),
-                KontenTile(),
-                KontenTile(),
-                KontenTile(),
+                Column(
+                  children: kontenProvider.kontens
+                      .map(
+                        (konten) => KontenTile(konten),
+                      )
+                      .toList(),
+                  // children: [
+                  //   KontenTile(),
+                  //   KontenTile(),
+                  //   KontenTile(),
+                  //   KontenTile(),
+                  //   KontenTile(),
+                  // ],
+                ),
               ],
             ),
           ],
@@ -279,3 +325,5 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+
+

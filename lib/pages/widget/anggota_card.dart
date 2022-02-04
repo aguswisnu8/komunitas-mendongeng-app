@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/anggota_model.dart';
+import 'package:kom_mendongeng/pages/detail_anggota_page.dart';
+import 'package:kom_mendongeng/public_function.dart';
+
 import 'package:kom_mendongeng/theme.dart';
 
 class AnggotaCard extends StatelessWidget {
+  late final AnggotaModel anggota;
+  AnggotaCard(this.anggota);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/d-anggota');
+        // Navigator.pushNamed(context, '/d-anggota');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailAnggotaPage(anggota),
+          ),
+        );
       },
       child: Container(
         margin: EdgeInsets.only(
@@ -33,15 +46,25 @@ class AnggotaCard extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      'assets/image_profile.png',
-                      width: 180,
-                      height: 180,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                  child: cekImage(anggota.profilePhotoPath.toString())
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            '${anggota.profilePhotoPath}',
+                            width: 180,
+                            height: 180,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            'assets/image_profile.png',
+                            width: 180,
+                            height: 180,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                 ),
                 SizedBox(
                   width: 12,
@@ -51,14 +74,16 @@ class AnggotaCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Agus Wisnu Kusuma Nata',
+                        '${anggota.name}',
+                        // 'Agus Wisnu Kusuma Nata',
                         style: blackTextStyle.copyWith(
                           fontWeight: semiBold,
                           fontSize: 16,
                         ),
                       ),
                       Text(
-                        'aguswisnu8@gmail.com',
+                        '${anggota.email}',
+                        // 'aguswisnu8@gmail.com',
                         style: greyTextStyle.copyWith(
                           fontWeight: light,
                         ),
@@ -73,7 +98,8 @@ class AnggotaCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'ig : aguswisnu__3',
+                        // 'ig : aguswisnu__3',
+                        '${anggota.medsos}',
                         style: greyTextStyle.copyWith(
                           fontWeight: light,
                           fontSize: 12,

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/pages/widget/anggota_card.dart';
+import 'package:kom_mendongeng/providers/anggota_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class AnggotaPage extends StatelessWidget {
   // const MendongengPage({ Key? key }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    AnggotaProvider anggotaProvider = Provider.of<AnggotaProvider>(context);
     Widget header() {
       return SliverAppBar(
         backgroundColor: secondaryColor,
@@ -46,7 +49,6 @@ class AnggotaPage extends StatelessWidget {
             Divider(
               thickness: 2,
             ),
-
           ],
         ),
       );
@@ -61,9 +63,19 @@ class AnggotaPage extends StatelessWidget {
       body: ListView(
         children: [
           deskripsi(),
-          AnggotaCard(),
-          AnggotaCard(),
-          AnggotaCard(),
+          Column(
+            children: anggotaProvider.anggotas
+                .map(
+                  (anggota) => AnggotaCard(anggota),
+                )
+                .toList(),
+          ),
+          SizedBox(
+            height: defaultMargin,
+          )
+          // AnggotaCard(),
+          // AnggotaCard(),
+          // AnggotaCard(),
         ],
       ),
     );

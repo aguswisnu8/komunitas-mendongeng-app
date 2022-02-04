@@ -1,11 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
-class DaftarPage extends StatelessWidget {
-  // const SignInPage({ Key? key }) : super(key: key);
+class DaftarPage extends StatefulWidget {
+  @override
+  State<DaftarPage> createState() => _DaftarPageState();
+}
+
+class _DaftarPageState extends State<DaftarPage> {
+  TextEditingController nameController = TextEditingController(text: '');
+
+  TextEditingController emailController = TextEditingController(text: '');
+
+  TextEditingController passwordController = TextEditingController(text: '');
+
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+
+    handleDaftar() async {
+      setState(() {
+        isLoading = true;
+      });
+      if (await authProvider.register(
+        name: nameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+      )) {
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Pendaftaran Gagal',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     Widget logo() {
       return Center(
         child: Image.asset(
@@ -71,7 +115,7 @@ class DaftarPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextFormField(
-                        // controller: nameController,
+                        controller: nameController,
                         style: blackTextStyle,
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Nama Kakak',
@@ -118,7 +162,7 @@ class DaftarPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextFormField(
-                        // controller: emailController,
+                        controller: emailController,
                         style: blackTextStyle,
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Email Kakak',
@@ -165,10 +209,9 @@ class DaftarPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextFormField(
-                        // controller: passwordController,
+                        controller: passwordController,
                         obscureText: true,
                         style: blackTextStyle,
-
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Password',
                             hintStyle: greyTextStyle),
@@ -191,9 +234,8 @@ class DaftarPage extends StatelessWidget {
         margin: EdgeInsets.only(top: 30),
         child: TextButton(
             onPressed: () {
-              // Navigator.pushNamed(context, '/home');
-              Navigator.pop(context);
-              // handleSignUp();
+              handleDaftar();
+              // Navigator.pop(context);
             },
             style: TextButton.styleFrom(
               backgroundColor: primaryColor,
@@ -218,12 +260,15 @@ class DaftarPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(
+                  height: 16,
+                ),
                 logo(),
                 headerText(),
                 nameInput(),
                 emailInput(),
                 passInput(),
-                signUpButton(),
+                isLoading ? LoadingButton() : signUpButton(),
                 SizedBox(
                   height: 30,
                 )

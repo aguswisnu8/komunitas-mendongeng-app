@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/anggota_model.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
 
-class DetailAnggotaPage extends StatelessWidget {
+class DetailAnggotaPage extends StatefulWidget {
+  late final AnggotaModel anggota;
+  DetailAnggotaPage(this.anggota);
+
+  @override
+  State<DetailAnggotaPage> createState() => _DetailAnggotaPageState();
+}
+
+class _DetailAnggotaPageState extends State<DetailAnggotaPage> {
   @override
   Widget build(BuildContext context) {
     Widget header() {
@@ -41,15 +51,25 @@ class DetailAnggotaPage extends StatelessWidget {
 
     Widget profileImage() {
       return Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Image.asset(
-            'assets/image_profile.png',
-            width: 180,
-            height: 180,
-            fit: BoxFit.cover,
-          ),
-        ),
+        child: cekImage(widget.anggota.profilePhotoPath.toString())
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.network(
+                  '${widget.anggota.profilePhotoPath}',
+                  width: 180,
+                  height: 180,
+                  fit: BoxFit.cover,
+                ),
+              )
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.asset(
+                  'assets/image_profile.png',
+                  width: 180,
+                  height: 180,
+                  fit: BoxFit.cover,
+                ),
+              ),
       );
     }
 
@@ -64,7 +84,8 @@ class DetailAnggotaPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Agus Wisnu Kusuma Nata',
+              '${widget.anggota.name}',
+              // 'Agus Wisnu Kusuma Nata',
               style: blackTextStyle.copyWith(
                 fontSize: 24,
                 fontWeight: semiBold,
@@ -74,29 +95,37 @@ class DetailAnggotaPage extends StatelessWidget {
               height: 2,
             ),
             Text(
-              'aguswisnu8@gmail.com',
+              '${widget.anggota.email}',
+              // 'aguswisnu8@gmail.com',
               style: greyTextStyle,
             ),
             SizedBox(
               height: 2,
             ),
             Text(
-              'ig: aguswisnu__3',
-              style: greyTextStyle,
-            ),
-            SizedBox(
-              height: 2,
-            ),
-            Text(
-              'Pengalaman sbg Pendendongeng : pemula',
+              'Pengalaman sbg Pendendongeng : ${cekPengalaman(widget.anggota.exp.toString())}',
+              // 'Pengalaman sbg Pendendongeng : pemula',
               style: greyTextStyle,
             ),
             Divider(
               thickness: 1,
             ),
             Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor.',
+              '${widget.anggota.deskripsi}',
+              // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor.',
               style: greyTextStyle.copyWith(fontSize: 16),
+            ),
+            SizedBox(
+              height: 2,
+            ),
+            Text(
+              'Kontak :',
+              style: greyTextStyle,
+            ),
+            Text(
+              '${widget.anggota.medsos}',
+              // 'ig: aguswisnu__3',
+              style: greyTextStyle,
             ),
           ],
         ),
