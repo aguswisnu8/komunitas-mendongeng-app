@@ -48,7 +48,7 @@ class AnggotaCard extends StatelessWidget {
                   ),
                   child: cekImage(anggota.profilePhotoPath.toString())
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(18),
                           child: Image.network(
                             '${anggota.profilePhotoPath}',
                             width: 180,

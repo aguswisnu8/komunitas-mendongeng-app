@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/partisipan_model.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
 
 class EditPartisipanPage extends StatefulWidget {
-  late final Map products;
-  EditPartisipanPage(this.products);
+  // late final Map products;
+  late final PartisipanModel partispan;
+  late final UserModel user;
+  EditPartisipanPage(this.partispan, this.user);
 
   @override
   _EditPartisipanPageState createState() => _EditPartisipanPageState();
@@ -21,7 +26,8 @@ class _EditPartisipanPageState extends State<EditPartisipanPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'MEndongeg Bersama Kak Dekdus',
+              'Kegiatan : ${widget.partispan.mendongeng?.name}',
+              // 'MEndongeg Bersama Kak Dekdus',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
                 fontWeight: semiBold,
@@ -31,7 +37,48 @@ class _EditPartisipanPageState extends State<EditPartisipanPage> {
               height: 2,
             ),
             Text(
-              widget.products['name'],
+              '${widget.partispan.mendongeng?.tgl} | ${widget.partispan.mendongeng?.lokasi}',
+              // widget.products['name'],
+              style: greyTextStyle,
+            ),
+            SizedBox(
+              height: 2,
+            ),
+            Text(
+              'Jumlah Mak. Pendongeng : ${widget.partispan.mendongeng?.stReq}',
+              // widget.products['name'],
+              style: greyTextStyle,
+            ),
+            SizedBox(
+              height: 2,
+            ),
+            Text(
+              'Pengalaman Min. Pendongeng : ${widget.partispan.mendongeng?.expReq} | ${cekPengalaman('${widget.partispan.mendongeng?.expReq}')}',
+              // widget.products['name'],
+              style: greyTextStyle,
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            Text(
+              'User : ${widget.partispan.user?.name}',
+              style: blackTextStyle.copyWith(
+                fontSize: 18,
+                fontWeight: semiBold,
+              ),
+            ),
+            SizedBox(
+              height: 2,
+            ),
+            Text(
+              '${widget.partispan.user?.email}',
+              style: greyTextStyle,
+            ),
+            SizedBox(
+              height: 2,
+            ),
+            Text(
+              '${widget.partispan.user?.exp} : ${cekPengalaman('${widget.partispan.user?.exp}')}',
               style: greyTextStyle,
             ),
           ],
@@ -46,9 +93,9 @@ class _EditPartisipanPageState extends State<EditPartisipanPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Peran User',
+              'Ubah User',
               style: blackTextStyle.copyWith(
-                fontWeight: medium,
+                fontWeight: semiBold,
               ),
             ),
             SizedBox(

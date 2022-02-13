@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/undangan_model.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/providers/undangan_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:provider/provider.dart';
 
 class AddUndanganPage extends StatefulWidget {
   @override
@@ -19,8 +24,68 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
   TextEditingController contactController = TextEditingController(text: '');
 
   String? jenisKegiatan = '';
+  bool isLoading = false;
+
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    UndanganProvider undanganProvider = Provider.of<UndanganProvider>(context);
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+
+    handleAddUndangan() async {
+      // print(nameController.text);
+      // print(pengirimController.text);
+      // print(penyelenggaraController.text);
+      // print(deskripsiController.text);
+      // print(jenisKegiatan);
+      // print(lokasiController.text);
+      // print(tglController.text);
+      // print(contactController.text);
+      setState(() {
+        isLoading = true;
+      });
+      if (await undanganProvider.addUndangan(
+        nmKegiatan: nameController.text,
+        pengirim: pengirimController.text,
+        lokasi: lokasiController.text,
+        tgl: tglController.text,
+        deskripsi: deskripsiController.text,
+        jenis: jenisKegiatan,
+        penyelenggara: penyelenggaraController.text,
+        contact: contactController.text,
+        status: 'tunggu',
+        token: authProvider.user.token,
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: primaryColor,
+            content: Text(
+              'Berhasil Mengirimkan Undangan',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Mengirimkan Undangan',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     Widget namaKegiatan() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -50,8 +115,15 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
                       child: TextFormField(
                         controller: nameController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
+                        // autovalidateMode: ,
                         decoration: InputDecoration.collapsed(
-                            hintText: 'Masukkan Nama Kegiatan Undangan',
+                            hintText: 'Masukkan Nama Kegiatan',
                             hintStyle: greyTextStyle),
                       ),
                     )
@@ -93,6 +165,12 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
                       child: TextFormField(
                         controller: pengirimController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Nama Pengirim',
                             hintStyle: greyTextStyle),
@@ -136,6 +214,12 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
                       child: TextFormField(
                         controller: penyelenggaraController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Nama/Instansi Pengelenggara',
                             hintStyle: greyTextStyle),
@@ -179,6 +263,12 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
                       child: TextFormField(
                         controller: lokasiController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Alamat Kegiatan',
                             hintStyle: greyTextStyle),
@@ -232,7 +322,7 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
                       print('confirm $date');
                       setState(() {
                         tglController.text =
-                            '${date.year}-${date.month}-${date.day}';
+                            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
                       });
                     },
                     currentTime: DateTime.now(),
@@ -281,6 +371,12 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
                         controller: deskripsiController,
                         keyboardType: TextInputType.multiline,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Deskripsi Kegiatan ',
                             hintStyle: greyTextStyle),
@@ -392,6 +488,12 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
                       child: TextFormField(
                         controller: contactController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Kontak',
                             hintStyle: greyTextStyle),
@@ -415,8 +517,14 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
         child: TextButton(
             onPressed: () {
               // Navigator.pushNamed(context, '/home');
-              Navigator.pop(context);
-              // handleSignUp();
+              // Navigator.pop(context);
+
+              if (_formKey.currentState!.validate()) {
+                handleAddUndangan();
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   const SnackBar(content: Text('Processing Data')),
+                // );
+              }
             },
             style: TextButton.styleFrom(
               backgroundColor: primaryColor,
@@ -438,15 +546,30 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
         width: double.infinity,
         child: ListView(
           children: [
-            namaKegiatan(),
-            pengirim(),
-            penyelenggara(),
-            deskripsi(),
-            jenis(),
-            lokasi(),
-            tgl(),
-            contact(),
-            addButton(),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  namaKegiatan(),
+                  pengirim(),
+                  penyelenggara(),
+                  deskripsi(),
+                  jenis(),
+                  lokasi(),
+                  tgl(),
+                  contact(),
+                ],
+              ),
+            ),
+            // namaKegiatan(),
+            // pengirim(),
+            // penyelenggara(),
+            // deskripsi(),
+            // jenis(),
+            // lokasi(),
+            // tgl(),
+            // contact(),
+            isLoading ? LoadingButton() : addButton(),
             SizedBox(
               height: defaultMargin,
             ),

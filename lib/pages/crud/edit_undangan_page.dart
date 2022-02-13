@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/undangan_model.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/pages/crud/add_mendongeng_from_undangan_page.dart';
+import 'package:kom_mendongeng/pages/profile/user_undangan_page.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class EditUndanganPage extends StatefulWidget {
-  late final Map products;
-  EditUndanganPage(this.products);
+  // late final Map products;
+  late final UndanganModel undangan;
+  late final UserModel user;
+  EditUndanganPage(this.undangan, this.user);
   @override
   State<EditUndanganPage> createState() => _EditUndanganPageState();
 }
 
 class _EditUndanganPageState extends State<EditUndanganPage> {
-  TextEditingController tglController =
-      TextEditingController(text: 'pilih tanggal');
-  String? jenisKegiatan = '';
   String? statusUndangan = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    statusUndangan = widget.undangan.status;
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget headerText() {
@@ -24,18 +35,12 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.products['name'],
-              style: greyTextStyle,
-            ),
-            SizedBox(
-              height: 6,
-            ),
-            Text(
               'Pengirim :',
               style: greyTextStyle,
             ),
             Text(
-              'Agus Wisnu Kusuma Nata',
+              // 'Agus Wisnu Kusuma Nata',
+              '${widget.undangan.pengirim}',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
               ),
@@ -48,7 +53,8 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
               style: greyTextStyle,
             ),
             Text(
-              'SD 2 Senyum',
+              // 'SD 2 Senyum',
+              '${widget.undangan.penyelenggara}',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
               ),
@@ -61,7 +67,8 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
               style: greyTextStyle,
             ),
             Text(
-              'Mendongeng Bersama Kak Dekdus',
+              '${widget.undangan.nmKegiatan}',
+              // 'Mendongeng Bersama Kak Dekdus',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
               ),
@@ -74,7 +81,8 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
               style: greyTextStyle,
             ),
             Text(
-              'Abiansemal',
+              '${widget.undangan.lokasi}',
+              // 'Abiansemal',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
               ),
@@ -87,7 +95,8 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
               style: greyTextStyle,
             ),
             Text(
-              '2022-2-22',
+              '${widget.undangan.tgl}',
+              // '2022-2-22',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
               ),
@@ -100,7 +109,8 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
               style: greyTextStyle,
             ),
             Text(
-              'Pada suatu saat, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor.',
+              '${widget.undangan.deskripsi}',
+              // 'Pada suatu saat, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec leo a purus tincidunt iaculis. Vestibulum et leo a tellus eleifend pulvinar. Sed consectetur sollicitudin purus non scelerisque. Nunc rhoncus massa at velit sollicitudin iaculis. Aenean dictum nec turpis eu consequat. Nunc porta congue tincidunt. Donec et condimentum dolor. Morbi nec consequat diam, eget imperdiet enim. Pellentesque nisi risus, pellentesque quis lorem et, porta volutpat massa. Duis condimentum tellus id libero volutpat sodales. Vivamus vel pulvinar tortor.',
               style: blackTextStyle.copyWith(
                 fontSize: 16,
               ),
@@ -113,7 +123,8 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
               style: greyTextStyle,
             ),
             Text(
-              'sekolah',
+              '${widget.undangan.jenis}',
+              // 'sekolah',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
               ),
@@ -126,7 +137,8 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
               style: greyTextStyle,
             ),
             Text(
-              '081234567890',
+              '${widget.undangan.contact}',
+              // '081234567890',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
               ),
@@ -206,14 +218,18 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
         child: TextButton(
             onPressed: () {
               // Navigator.pushNamed(context, '/home');
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      AddMendongengFromUndanganPage(widget.products),
-                ),
-              );
+              if (statusUndangan == 'terima') {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        AddMendongengFromUndanganPage(widget.undangan),
+                  ),
+                );
+              } else {
+                Navigator.pop(context);
+              }
               // handleSignUp();
             },
             style: TextButton.styleFrom(
@@ -238,7 +254,7 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
           children: [
             headerText(),
             status(),
-            editButton(),
+            widget.undangan.status == 'terima' ? SizedBox() : editButton(),
             SizedBox(
               height: defaultMargin,
             ),

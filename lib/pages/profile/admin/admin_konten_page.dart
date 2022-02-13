@@ -1,8 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/pages/crud/edit_konten_page.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/providers/konten_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class AdminKontenPage extends StatefulWidget {
   @override
@@ -19,6 +23,11 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserModel user = authProvider.user;
+
+    KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+
     Future<void> showDeleteDialog(int id, String name) {
       return showDialog(
         context: context,
@@ -111,29 +120,50 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
           sortAscending: _isAscending,
           // border: ,
           columns: [
-            DataColumn(label: Text('id')),
-            DataColumn(label: Text('name')),
             DataColumn(
-              label: Text('price'),
+              label: Text('id'),
               onSort: (columnIndex, ascending) {
                 setState(() {
                   _currentSortColumn = columnIndex;
                   _isAscending = ascending;
                   if (ascending) {
-                    _products.sort((a, b) => b['price'].compareTo(a['price']));
+                    kontenProvider.kontens
+                        .sort((a, b) => b.id!.toInt().compareTo(a.id!.toInt()));
                   } else {
-                    _products.sort((a, b) => a['price'].compareTo(b['price']));
+                    kontenProvider.kontens
+                        .sort((a, b) => a.id!.toInt().compareTo(b.id!.toInt()));
                   }
                 });
               },
             ),
+            DataColumn(label: Text('judul')),
+            DataColumn(label: Text('jenis')),
+            DataColumn(label: Text('user')),
             DataColumn(label: Text('edit')),
+            // DataColumn(label: Text('id')),
+            // DataColumn(label: Text('name')),
+            // DataColumn(
+            //   label: Text('price'),
+            //   onSort: (columnIndex, ascending) {
+            //     setState(() {
+            //       _currentSortColumn = columnIndex;
+            //       _isAscending = ascending;
+            //       if (ascending) {
+            //         _products.sort((a, b) => b['price'].compareTo(a['price']));
+            //       } else {
+            //         _products.sort((a, b) => a['price'].compareTo(b['price']));
+            //       }
+            //     });
+            //   },
+            // ),
+            // DataColumn(label: Text('edit')),
           ],
-          rows: _products.map((item) {
+          rows: kontenProvider.kontens.map((konten) {
             return DataRow(cells: [
-              DataCell(Text(item['id'].toString())),
-              DataCell(Text(item['name'])),
-              DataCell(Text(item['price'].toString())),
+              DataCell(Text('${konten.id}')),
+              DataCell(Text('${konten.judul}')),
+              DataCell(Text('${konten.jenis}')),
+              DataCell(Text('${konten.user?.name}')),
               DataCell(
                 Row(
                   children: [
@@ -142,7 +172,7 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditKontenPage(item),
+                            builder: (context) => EditKontenPage(konten, user),
                           ),
                         );
                       },
@@ -159,7 +189,8 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        showDeleteDialog(item['id'], item['name']);
+                        showDeleteDialog(
+                            konten.id!.toInt(), konten.judul.toString());
                       },
                       child: Container(
                         color: Colors.redAccent,
@@ -174,6 +205,51 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
               )
             ]);
           }).toList(),
+          // rows: _products.map((item) {
+          //   return DataRow(cells: [
+          //     DataCell(Text(item['id'].toString())),
+          //     DataCell(Text(item['name'])),
+          //     DataCell(Text(item['price'].toString())),
+          //     DataCell(
+          //       Row(
+          //         children: [
+          //           GestureDetector(
+          //             onTap: () {
+          //               // Navigator.push(
+          //               //   context,
+          //               //   MaterialPageRoute(
+          //               //     builder: (context) => EditKontenPage(item),
+          //               //   ),
+          //               // );
+          //             },
+          //             child: Container(
+          //               color: Colors.blueAccent,
+          //               child: Icon(
+          //                 Icons.edit,
+          //                 color: whiteTextColor,
+          //               ),
+          //             ),
+          //           ),
+          //           SizedBox(
+          //             width: 10,
+          //           ),
+          //           GestureDetector(
+          //             onTap: () {
+          //               showDeleteDialog(item['id'], item['name']);
+          //             },
+          //             child: Container(
+          //               color: Colors.redAccent,
+          //               child: Icon(
+          //                 Icons.delete,
+          //                 color: whiteTextColor,
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     )
+          //   ]);
+          // }).toList(),
         ),
       );
     }

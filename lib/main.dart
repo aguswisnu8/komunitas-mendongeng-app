@@ -21,6 +21,8 @@ import 'package:kom_mendongeng/pages/splash_page.dart';
 import 'package:kom_mendongeng/providers/auth_provider.dart';
 import 'package:kom_mendongeng/providers/konten_provider.dart';
 import 'package:kom_mendongeng/providers/mendongeng_provider.dart';
+import 'package:kom_mendongeng/providers/page_provider.dart';
+import 'package:kom_mendongeng/providers/partisipan_provider.dart';
 import 'package:kom_mendongeng/providers/undangan_provider.dart';
 import 'package:kom_mendongeng/providers/anggota_provider.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +53,12 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => AnggotaProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PartisipanProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PageProvider(),
         ),
       ],
       child: MaterialApp(

@@ -2,9 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/providers/mendongeng_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class AddMendongengPage extends StatefulWidget {
   @override
@@ -23,6 +27,7 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
   TextEditingController stReqController = TextEditingController(text: '');
   // image picker
   var _image;
+  // File image;
   var imagePicker;
 
   @override
@@ -33,8 +38,87 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
   }
 
   String? jenisKegiatan = '';
+
+  bool isLoading = false;
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    MendongengProvider mendongengProvider =
+        Provider.of<MendongengProvider>(context);
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+
+    addMendongeng() async {
+      setState(() {
+        isLoading = true;
+      });
+      // print(nameController.text);
+      // print(partnerController.text);
+      // print(lokasiController.text);
+      // print(_image.path);
+      // print(tglController.text);
+      // print(deskripsiController.text);
+      // print(jenisKegiatan);
+      // print(gmapController.text);
+      // print(expReqController.text);
+      // print(stReqController.text);
+      if (await mendongengProvider.addMendongeng(
+        name: nameController.text,
+        partner: partnerController.text,
+        lokasi: lokasiController.text,
+        filePath: _image.path,
+        tgl: tglController.text,
+        deskripsi: deskripsiController.text,
+        jenis: jenisKegiatan,
+        gmapLink: gmapController.text,
+        expReq: int.parse(expReqController.text),
+        stReq: int.parse(stReqController.text),
+        status: 1,
+        token: authProvider.user.token,
+        // udanganId: 0,
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: primaryColor,
+            content: Text(
+              'Berhasil Menambahkan Kegiatan Baru',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Menambahkan Kegiatan Baru',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+
+      setState(() {
+        isLoading = true;
+      });
+    }
+
+    testImage() async {
+      if (_image != null) {
+        if (await mendongengProvider.testImage(_image.path)) {
+          print('Upload Berhasil');
+        } else {
+          print('Upload Gagal');
+        }
+      } else {
+        print('Image Kosong');
+      }
+    }
+
     Widget namaKegiatan() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -64,6 +148,12 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                       child: TextFormField(
                         controller: nameController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Nama Kegiatan',
                             hintStyle: greyTextStyle),
@@ -107,6 +197,12 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                       child: TextFormField(
                         controller: partnerController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Nama/Instansi Partner Kegiatan',
                             hintStyle: greyTextStyle),
@@ -150,6 +246,12 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                       child: TextFormField(
                         controller: lokasiController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Alamat Kegiatan',
                             hintStyle: greyTextStyle),
@@ -215,6 +317,8 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                         _image = File(image!.path);
                       });
                       print('isi file _image $_image');
+                      print('isi file _image ${_image.path}');
+                      print(_image.path);
                       // print('path _image ${_image.toString()}');
                     },
                     child: Text(
@@ -269,7 +373,7 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                       print('confirm $date');
                       setState(() {
                         tglController.text =
-                            '${date.year}-${date.month}-${date.day}';
+                            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
                       });
                     },
                     currentTime: DateTime.now(),
@@ -318,6 +422,12 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                         controller: deskripsiController,
                         keyboardType: TextInputType.multiline,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Deskripsi Kegiatan ',
                             hintStyle: greyTextStyle),
@@ -429,6 +539,12 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                       child: TextFormField(
                         controller: gmapController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Link Google Map',
                             hintStyle: greyTextStyle),
@@ -479,6 +595,12 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                         controller: expReqController,
                         keyboardType: TextInputType.number,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'nilai pengalaman kakak (1-5)',
                             hintStyle: greyTextStyle),
@@ -529,6 +651,12 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
                         controller: stReqController,
                         keyboardType: TextInputType.number,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Jumlah Pendongeng',
                             hintStyle: greyTextStyle),
@@ -552,8 +680,26 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
         child: TextButton(
           onPressed: () {
             // Navigator.pushNamed(context, '/home');
-            Navigator.pop(context);
-            // handleSignUp();
+            // Navigator.pop(context);
+            // testImage();
+            if (_formKey.currentState!.validate() &&
+                _image != null &&
+                jenisKegiatan!.isNotEmpty &&
+                tglController.text == 'pilih tanggal') {
+              addMendongeng();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  duration: Duration(seconds: 1),
+                  backgroundColor: Colors.redAccent,
+                  content: Text(
+                    'Terdapat data yang masih kosong',
+                    style: whiteTextStyle,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
           },
           style: TextButton.styleFrom(
             backgroundColor: primaryColor,
@@ -575,17 +721,24 @@ class _AddMendongengPageState extends State<AddMendongengPage> {
         width: double.infinity,
         child: ListView(
           children: [
-            namaKegiatan(),
-            partner(),
-            jenis(),
-            lokasi(),
-            gmapLink(),
-            deskripsi(),
-            gambar(),
-            tgl(),
-            expReq(),
-            stReq(),
-            addButton(),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  namaKegiatan(),
+                  partner(),
+                  jenis(),
+                  lokasi(),
+                  gmapLink(),
+                  deskripsi(),
+                  gambar(),
+                  tgl(),
+                  expReq(),
+                  stReq(),
+                ],
+              ),
+            ),
+            isLoading ? LoadingButton() : addButton(),
             SizedBox(
               height: defaultMargin,
             ),

@@ -1,8 +1,13 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/pages/crud/edit_partisipan_page.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/providers/partisipan_provider.dart';
+import 'package:kom_mendongeng/providers/undangan_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class AdminPartisipanPage extends StatefulWidget {
   @override
@@ -10,15 +15,33 @@ class AdminPartisipanPage extends StatefulWidget {
 }
 
 class _AdminPartisipanPageState extends State<AdminPartisipanPage> {
-  final List<Map> _products = List.generate(10, (i) {
-    return {"id": i, "name": "Product $i", "price": Random().nextInt(200) + 1};
-  });
+  @override
+  void initState() {
+    getInit();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  getInit() async {
+    await Provider.of<PartisipanProvider>(context, listen: false)
+        .getPartisipans();
+  }
+
+  // final List<Map> _products = List.generate(10, (i) {
+  //   return {"id": i, "name": "Product $i", "price": Random().nextInt(200) + 1};
+  // });
 
   int _currentSortColumn = 0;
   bool _isAscending = false;
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserModel user = authProvider.user;
+
+    PartisipanProvider partisipanProvider =
+        Provider.of<PartisipanProvider>(context);
+
     Future<void> showDeleteDialog(int id, String name) {
       return showDialog(
         context: context,
@@ -46,7 +69,7 @@ class _AdminPartisipanPageState extends State<AdminPartisipanPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Konten $id',
+                    'Hapus data $id',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,
@@ -111,29 +134,53 @@ class _AdminPartisipanPageState extends State<AdminPartisipanPage> {
           sortAscending: _isAscending,
           // border: ,
           columns: [
-            DataColumn(label: Text('id')),
-            DataColumn(label: Text('name')),
             DataColumn(
-              label: Text('price'),
+              label: Text('id kegiatan'),
               onSort: (columnIndex, ascending) {
                 setState(() {
                   _currentSortColumn = columnIndex;
                   _isAscending = ascending;
                   if (ascending) {
-                    _products.sort((a, b) => b['price'].compareTo(a['price']));
+                    partisipanProvider.partisipans.sort((a, b) => b
+                        .mendongengId!
+                        .toInt()
+                        .compareTo(a.mendongengId!.toInt()));
                   } else {
-                    _products.sort((a, b) => a['price'].compareTo(b['price']));
+                    partisipanProvider.partisipans.sort((a, b) => a
+                        .mendongengId!
+                        .toInt()
+                        .compareTo(b.mendongengId!.toInt()));
                   }
                 });
               },
             ),
+            DataColumn(label: Text('kegiatan')),
+            DataColumn(label: Text('partisipan')),
+            DataColumn(label: Text('peran')),
             DataColumn(label: Text('edit')),
+            // DataColumn(label: Text('name')),
+            // DataColumn(
+            //   label: Text('price'),
+            //   onSort: (columnIndex, ascending) {
+            //     setState(() {
+            //       _currentSortColumn = columnIndex;
+            //       _isAscending = ascending;
+            //       if (ascending) {
+            //         _products.sort((a, b) => b['price'].compareTo(a['price']));
+            //       } else {
+            //         _products.sort((a, b) => a['price'].compareTo(b['price']));
+            //       }
+            //     });
+            //   },
+            // ),
+            // DataColumn(label: Text('edit')),
           ],
-          rows: _products.map((item) {
+          rows: partisipanProvider.partisipans.map((partisipan) {
             return DataRow(cells: [
-              DataCell(Text(item['id'].toString())),
-              DataCell(Text(item['name'])),
-              DataCell(Text(item['price'].toString())),
+              DataCell(Text('${partisipan.mendongengId}')),
+              DataCell(Text('${partisipan.mendongeng?.name}')),
+              DataCell(Text('${partisipan.user?.name}')),
+              DataCell(Text('${partisipan.peran}')),
               DataCell(
                 Row(
                   children: [
@@ -142,7 +189,8 @@ class _AdminPartisipanPageState extends State<AdminPartisipanPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditPartisipanPage(item),
+                            builder: (context) =>
+                                EditPartisipanPage(partisipan, user),
                           ),
                         );
                       },
@@ -159,7 +207,8 @@ class _AdminPartisipanPageState extends State<AdminPartisipanPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        showDeleteDialog(item['id'], item['name']);
+                        showDeleteDialog(partisipan.id!,
+                            '${partisipan.user?.name} pada kegiatan ${partisipan.mendongeng?.name}');
                       },
                       child: Container(
                         color: Colors.redAccent,
@@ -174,6 +223,51 @@ class _AdminPartisipanPageState extends State<AdminPartisipanPage> {
               )
             ]);
           }).toList(),
+          // rows: _products.map((item) {
+          //   return DataRow(cells: [
+          //     DataCell(Text(item['id'].toString())),
+          //     DataCell(Text(item['name'])),
+          //     DataCell(Text(item['price'].toString())),
+          //     DataCell(
+          //       Row(
+          //         children: [
+          //           GestureDetector(
+          //             onTap: () {
+          //               Navigator.push(
+          //                 context,
+          //                 MaterialPageRoute(
+          //                   builder: (context) => EditPartisipanPage(item),
+          //                 ),
+          //               );
+          //             },
+          //             child: Container(
+          //               color: Colors.blueAccent,
+          //               child: Icon(
+          //                 Icons.edit,
+          //                 color: whiteTextColor,
+          //               ),
+          //             ),
+          //           ),
+          //           SizedBox(
+          //             width: 10,
+          //           ),
+          //           GestureDetector(
+          //             onTap: () {
+          //               showDeleteDialog(item['id'], item['name']);
+          //             },
+          //             child: Container(
+          //               color: Colors.redAccent,
+          //               child: Icon(
+          //                 Icons.delete,
+          //                 color: whiteTextColor,
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     )
+          //   ]);
+          // }).toList(),
         ),
       );
     }
@@ -184,6 +278,9 @@ class _AdminPartisipanPageState extends State<AdminPartisipanPage> {
         width: double.infinity,
         child: ListView(
           children: [
+            SizedBox(
+              height: defaultMargin,
+            ),
             tableKonten(),
             SizedBox(
               height: defaultMargin,

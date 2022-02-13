@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/models/mendongeng_model.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/providers/partisipan_provider.dart';
 import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailMendongengPage extends StatefulWidget {
@@ -13,8 +19,88 @@ class DetailMendongengPage extends StatefulWidget {
 }
 
 class _DetailMendongengPageState extends State<DetailMendongengPage> {
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
+    PartisipanProvider partisipanProvider =
+        Provider.of<PartisipanProvider>(context);
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    bool flag = authProvider.logged;
+
+    Future<void> loadingDialog() {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => Container(
+          // width: MediaQuery.of(context).size.width - (4 * defaultMargin),
+          width: 200,
+          child: AlertDialog(
+            backgroundColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: defaultMargin),
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    test() {
+      Navigator.pop(context);
+      loadingDialog();
+      // Timer(Duration(seconds: 10), () {});
+      // Navigator.pop(context);
+    }
+
+    handleAddPartispan(String peran) async {
+      Navigator.pop(context);
+      loadingDialog();
+      List response = await partisipanProvider.addPartisipan(
+        widget.mendongeng.id!,
+        peran,
+        authProvider.user.token.toString(),
+      );
+      if (response[1] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: primaryColor,
+            content: Text(
+              'Berhasil terdata sebagai $peran',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              '${response[0]}',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      Navigator.pop(context);
+    }
+
     _launchURL(String url) async {
       if (await canLaunch(url)) {
         await launch(url);
@@ -185,7 +271,7 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
                     ),
                   ),
                   Text(
-                    'max. 2 orang berpengalaman (exp: 2)',
+                    'max. ${widget.mendongeng.stReq} orang, dg kriteria: ${cekPengalaman(widget.mendongeng.expReq.toString())} (exp: ${widget.mendongeng.expReq})',
                     style: greyTextStyle.copyWith(
                       fontSize: 12,
                       fontWeight: semiBold,
@@ -194,24 +280,14 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
                   SizedBox(
                     height: 6,
                   ),
+                  isLoading ? LoadingButton() : SizedBox(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
-                          // print('peserta');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              duration: Duration(seconds: 1),
-                              backgroundColor: primaryColor,
-                              content: Text(
-                                'peserta',
-                                style: whiteTextStyle,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          );
+                          handleAddPartispan('peserta');
+                          // test();
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: primaryColor,
@@ -220,7 +296,7 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
                           ),
                         ),
                         child: Text(
-                          'perserta',
+                          'peserta',
                           style: whiteTextStyle.copyWith(
                             fontSize: 16,
                             fontWeight: medium,
@@ -232,19 +308,23 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
-                          print('pendongeng');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              duration: Duration(seconds: 1),
-                              backgroundColor: primaryColor,
-                              content: Text(
-                                'pendongeng',
-                                style: whiteTextStyle,
-                                textAlign: TextAlign.center,
+                          if (widget.mendongeng.expReq! <=
+                              authProvider.user.exp!) {
+                            handleAddPartispan('pendongeng');
+                          } else {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: Duration(seconds: 1),
+                                backgroundColor: Colors.redAccent,
+                                content: Text(
+                                  'Pengalaman Tidak Sesuai',
+                                  style: whiteTextStyle,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: primaryColor,
@@ -278,10 +358,22 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
           margin: EdgeInsets.symmetric(vertical: 10),
           child: TextButton(
               onPressed: () {
-                // Navigator.pushNamed(context, '/home');
-                // Navigator.pop(context);
-                showIkutDialog();
-                // handleSignUp();
+                if (flag) {
+                  showIkutDialog();
+                } else {
+                  // print('anda belum login');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: Duration(seconds: 1),
+                      backgroundColor: Colors.redAccent,
+                      content: Text(
+                        'Login Terlebih Dahulu',
+                        style: whiteTextStyle,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
               },
               style: TextButton.styleFrom(
                 backgroundColor: primaryColor,

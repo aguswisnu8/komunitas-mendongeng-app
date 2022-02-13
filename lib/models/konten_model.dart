@@ -31,7 +31,7 @@ class KontenModel {
     deskripsi = json['deskripsi'];
     jenis = json['jenis'];
     status = json['status'];
-    userId = json['user_d'];
+    userId = json['user_id'];
     user = UserModel.fromJson(json['user']);
   }
 

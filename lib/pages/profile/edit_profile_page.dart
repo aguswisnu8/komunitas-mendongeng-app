@@ -2,7 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -36,6 +40,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserModel user = authProvider.user;
+    nameController.text = user.name.toString();
+    emailController.text = user.email.toString();
+    alamatController.text = user.alamat.toString();
+    kontakController.text = user.medsos.toString();
+    deskripsiController.text = user.deskripsi.toString();
+    expController.text = user.exp.toString();
+
     Widget nameInput() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -272,7 +285,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
             ),
             Text(
-              'rating: pemula - profesional (1-5)',
+              'rating: tidak ada-pemula-sedang-menengah-profesional (1-5)',
               style: greyTextStyle.copyWith(
                 fontWeight: medium,
               ),
@@ -332,9 +345,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             decoration: BoxDecoration(color: backgroundColor),
                             width: 100,
                             height: 100,
-                            child: Image(
-                              image: AssetImage('assets/image_profile.png'),
-                            ),
+                            child: cekImage(user.profilePhotoPath.toString())
+                                ? Image(
+                                    image: NetworkImage(
+                                        user.profilePhotoPath.toString()),
+                                  )
+                                : Image(
+                                    image:
+                                        AssetImage('assets/image_profile.png'),
+                                  ),
                           ),
                   ),
                   TextButton(

@@ -4,7 +4,9 @@ import 'package:kom_mendongeng/pages/home/home_page.dart';
 import 'package:kom_mendongeng/pages/home/konten_page.dart';
 import 'package:kom_mendongeng/pages/home/mendongeng_page.dart';
 import 'package:kom_mendongeng/pages/home/profile_page.dart';
+import 'package:kom_mendongeng/providers/page_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -16,16 +18,21 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget CustonBottomNav() {
+    PageProvider pageProvider = Provider.of<PageProvider>(context);
+
+    Widget custonBottomNav() {
       return BottomNavigationBar(
         backgroundColor: Color(0xffFAFAFA),
         type: BottomNavigationBarType.fixed,
-        currentIndex: currentIndex,
+        // currentIndex: currentIndex,
+        currentIndex: pageProvider.currentIndex,
         onTap: (value) {
-          setState(() {
-            currentIndex = value;
-            print(value);
-          });
+          print(value);
+          pageProvider.currentIndex = value;
+          // setState(() {
+          //   currentIndex = value;
+          //   print(value);
+          // });
         },
         selectedItemColor: secondaryColor,
         unselectedItemColor: Color(0xffD1D1D1),
@@ -95,7 +102,8 @@ class _MainPageState extends State<MainPage> {
     }
 
     Widget body() {
-      switch (currentIndex) {
+      // switch (currentIndex) {
+      switch (pageProvider.currentIndex) {
         case 0:
           return HomePage();
         case 1:
@@ -112,7 +120,7 @@ class _MainPageState extends State<MainPage> {
     }
 
     return Scaffold(
-      bottomNavigationBar: CustonBottomNav(),
+      bottomNavigationBar: custonBottomNav(),
       body: body(),
     );
   }

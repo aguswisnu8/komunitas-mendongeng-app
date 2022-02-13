@@ -2,11 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kom_mendongeng/models/konten_model.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
 
 class EditKontenPage extends StatefulWidget {
-  late final Map products;
-  EditKontenPage(this.products);
+  late final KontenModel konten;
+  late final UserModel user;
+  EditKontenPage(this.konten, this.user);
   @override
   State<EditKontenPage> createState() => _EditKontenPageState();
 }
@@ -21,9 +25,16 @@ class _EditKontenPageState extends State<EditKontenPage> {
     // TODO: implement initState
     super.initState();
     imagePicker = new ImagePicker();
+
+    judulController.text = widget.konten.judul.toString();
+    linkController.text = widget.konten.link.toString();
+    deskripsiController.text = widget.konten.deskripsi.toString();
+    jenisKonten = widget.konten.jenis;
+    statusKonten = widget.konten.status;
   }
 
   String? jenisKonten = '';
+  String? pathGambarKonten = '';
   int? statusKonten = 1;
   TextEditingController judulController =
       TextEditingController(text: 'Mendongeng Bersama Kak Dekdus');
@@ -107,14 +118,22 @@ class _EditKontenPageState extends State<EditKontenPage> {
                             height: 200.0,
                             fit: BoxFit.fitHeight,
                           )
-                        : Container(
-                            decoration: BoxDecoration(color: backgroundColor),
-                            width: 200,
-                            height: 200,
-                            child: Icon(
-                              Icons.camera_alt,
-                            ),
-                          ),
+                        : cekImage(widget.konten.gambar.toString())
+                            ? Image.network(
+                                '${widget.konten.gambar}',
+                                width: 200.0,
+                                height: 200.0,
+                                fit: BoxFit.fitHeight,
+                              )
+                            : Container(
+                                decoration:
+                                    BoxDecoration(color: backgroundColor),
+                                width: 200,
+                                height: 200,
+                                child: Icon(
+                                  Icons.camera_alt,
+                                ),
+                              ),
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
@@ -128,6 +147,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
                       setState(() {
                         _image = File(image!.path);
                       });
+                      pathGambarKonten = image!.path;
                       print('isi file _image $_image');
                     },
                     child: Text(
@@ -263,7 +283,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
               ),
               child: Center(
                 child: Text(
-                  'Video',
+                  '${widget.konten.jenis}',
                   style: blackTextStyle.copyWith(fontSize: 18),
                 ),
               ),
@@ -298,7 +318,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
               ),
               child: Center(
                 child: Text(
-                  'Agus Wisnu',
+                  '${widget.konten.user?.name}',
                   style: blackTextStyle.copyWith(fontSize: 18),
                 ),
               ),

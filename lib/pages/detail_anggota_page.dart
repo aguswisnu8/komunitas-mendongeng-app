@@ -116,7 +116,7 @@ class _DetailAnggotaPageState extends State<DetailAnggotaPage> {
               style: greyTextStyle.copyWith(fontSize: 16),
             ),
             SizedBox(
-              height: 2,
+              height: 16,
             ),
             Text(
               'Kontak :',

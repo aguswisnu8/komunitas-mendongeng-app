@@ -31,4 +31,44 @@ class KontenService {
       throw Exception('Gagal Mendapatkan List Konten');
     }
   }
+
+  Future<bool> addKonten({
+    String? judul,
+    String? filePath,
+    String? link,
+    String? deskripsi,
+    String? jenis,
+    int? status,
+    String? token,
+  }) async {
+    var url = '$baseUrl/kontens';
+    var headers = {
+      // 'Content-Type': 'application/json',
+      'Authorization': token.toString(),
+    };
+
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    request.files
+        .add(await http.MultipartFile.fromPath('gambar', filePath.toString()));
+    request.fields['judul'] = judul.toString();
+    request.fields['link'] = link.toString();
+    request.fields['deskripsi'] = deskripsi.toString();
+    request.fields['jenis'] = jenis.toString();
+    request.fields['status'] = status.toString();
+
+    request.headers.addAll(headers);
+
+    var response = await request.send();
+    var responseString = await response.stream.bytesToString();
+    print(responseString);
+    print("Servis Upload Konten ${response.statusCode}");
+
+    if (response.statusCode == 200) {
+      print("Servis Upload Berhasil");
+      return true;
+    } else {
+      print("Servis Upload Gagal");
+      return false;
+    }
+  }
 }

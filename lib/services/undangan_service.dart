@@ -5,7 +5,6 @@ import 'package:kom_mendongeng/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:kom_mendongeng/models/undangan_model.dart';
 
-
 class UndanganService {
   String baseUrl = ApiConfig.getUrl();
 
@@ -28,6 +27,50 @@ class UndanganService {
       return undangans;
     } else {
       throw Exception('Gagal Mendapatkan List Undangan');
+    }
+  }
+
+  Future<bool> addUndangan({
+    String? nmKegiatan,
+    String? pengirim,
+    String? lokasi,
+    String? tgl,
+    String? deskripsi,
+    String? jenis,
+    String? penyelenggara,
+    String? contact,
+    String? status,
+    String? token,
+  }) async {
+    var url = '$baseUrl/undangans';
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.toString(),
+    };
+    var body = jsonEncode({
+      'pengirim': pengirim,
+      'nm_kegiatan': nmKegiatan,
+      'lokasi': lokasi,
+      'tgl': tgl,
+      'deskripsi': deskripsi,
+      'jenis': jenis,
+      'penyelenggara': penyelenggara,
+      'contact': contact,
+      'status': status,
+    });
+
+    var response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Gagal Mendata Partisipan');
     }
   }
 }

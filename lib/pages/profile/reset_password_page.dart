@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   @override
@@ -12,6 +15,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserModel user = authProvider.user;
     Widget newPassword() {
       return Container(
         margin: EdgeInsets.only(top: 30),

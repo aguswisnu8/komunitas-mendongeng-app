@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/anggota_model.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/theme.dart';
 
 class EditAkunPage extends StatefulWidget {
-  late final Map products;
-  EditAkunPage(this.products);
+  // late final Map products;
+  late final AnggotaModel anggota;
+  late final UserModel user;
+  EditAkunPage(this.anggota, this.user);
 
   @override
   _EditAkunPageState createState() => _EditAkunPageState();
@@ -12,6 +16,15 @@ class EditAkunPage extends StatefulWidget {
 class _EditAkunPageState extends State<EditAkunPage> {
   int? _groupValue = 1;
   String? userLevel = 'anggota';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _groupValue = widget.anggota.active;
+    userLevel = widget.anggota.level;
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget headerText() {
@@ -21,7 +34,8 @@ class _EditAkunPageState extends State<EditAkunPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Agus Wisnu Kusuma Nata',
+              '${widget.anggota.name}',
+              // 'Agus Wisnu Kusuma Nata',
               style: blackTextStyle.copyWith(
                 fontSize: 18,
                 fontWeight: semiBold,
@@ -31,7 +45,8 @@ class _EditAkunPageState extends State<EditAkunPage> {
               height: 2,
             ),
             Text(
-              widget.products['name'],
+              // widget.products['name'],
+              widget.anggota.email.toString(),
               style: greyTextStyle,
             ),
           ],
@@ -64,7 +79,10 @@ class _EditAkunPageState extends State<EditAkunPage> {
               child: Column(
                 children: [
                   RadioListTile(
-                    title: Text('Admin', style: blackTextStyle,),
+                    title: Text(
+                      'Admin',
+                      style: blackTextStyle,
+                    ),
                     value: 'admin',
                     groupValue: userLevel,
                     onChanged: (String? newValue) => setState(() {

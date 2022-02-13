@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/api_config.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/pages/profile/edit_profile_page.dart';
 import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -20,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String level = 'anggota';
     String? name;
     String? email;
+    String? image;
     bool flag = authProvider.logged;
 
     if (flag) {
@@ -27,6 +30,7 @@ class _ProfilePageState extends State<ProfilePage> {
       level = user.level.toString();
       name = user.name;
       email = user.email;
+      image = user.profilePhotoPath;
     }
 
     Widget header() {
@@ -39,12 +43,23 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.all(16),
             child: Row(
               children: [
-                ClipOval(
-                  child: Image.asset(
-                    'assets/image_profile.png',
-                    width: 64,
-                  ),
-                ),
+                cekImage(image.toString())
+                    ? ClipOval(
+                        child: Image.network(
+                          image.toString(),
+                          width: 80,
+                          fit: BoxFit.cover,
+                          height: 80,
+                        ),
+                      )
+                    : ClipOval(
+                        child: Image.asset(
+                          'assets/image_profile.png',
+                          width: 80,
+                          fit: BoxFit.cover,
+                          height: 80,
+                        ),
+                      ),
                 SizedBox(
                   width: 16,
                 ),
@@ -113,6 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     Widget content() {
+      // UserModel user = ;
       return Expanded(
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: defaultMargin),
@@ -136,6 +152,12 @@ class _ProfilePageState extends State<ProfilePage> {
               GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, '/p-edit');
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => EditProfilePage(user),
+                  //   ),
+                  // );
                 },
                 child: menuItem('Edit Profile'),
               ),
@@ -214,9 +236,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       );
     }
-    // Widget login(){
-    //   return
-    // }
 
     Widget auth() {
       return Column(

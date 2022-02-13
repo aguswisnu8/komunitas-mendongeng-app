@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/konten_model.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/pages/crud/edit_konten_page.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/providers/konten_provider.dart';
+
 import 'package:kom_mendongeng/theme.dart';
 import 'dart:math';
+
+import 'package:provider/provider.dart';
 
 class UserKontenPage extends StatefulWidget {
   @override
@@ -18,7 +25,28 @@ class _UserKontenPageState extends State<UserKontenPage> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> showDeleteDialog(int id, String name) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserModel user = authProvider.user;
+
+    KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+
+    // List<KontenModel> filterKontens = [];
+    // kontenProvider.kontens.map((e) {
+    //   if (e.user?.id == user.id) {
+    //     filterKontens.add(e);
+    //   }
+    // }).toList();
+
+    // print('panjang filter page ${filterKontens.length}');
+    // filterKontens.map((e) {
+    //   print(e.id);
+    // }).toList();
+
+    kontenProvider.getKontenByUserId(user.id);
+
+    print('panjang filter provider ${kontenProvider.filterKontens.length}');
+
+    Future<void> showDeleteDialog(String id, String name) {
       return showDialog(
         context: context,
         builder: (BuildContext context) => Container(
@@ -132,29 +160,50 @@ class _UserKontenPageState extends State<UserKontenPage> {
           sortAscending: _isAscending,
           // border: ,
           columns: [
-            DataColumn(label: Text('id')),
-            DataColumn(label: Text('name')),
             DataColumn(
-              label: Text('price'),
+              label: Text('id'),
               onSort: (columnIndex, ascending) {
                 setState(() {
                   _currentSortColumn = columnIndex;
                   _isAscending = ascending;
                   if (ascending) {
-                    _products.sort((a, b) => b['price'].compareTo(a['price']));
+                    kontenProvider.kontens
+                        .sort((a, b) => b.id!.toInt().compareTo(a.id!.toInt()));
                   } else {
-                    _products.sort((a, b) => a['price'].compareTo(b['price']));
+                    kontenProvider.kontens
+                        .sort((a, b) => a.id!.toInt().compareTo(b.id!.toInt()));
                   }
                 });
               },
             ),
+            DataColumn(label: Text('judul')),
+            DataColumn(label: Text('jenis')),
+            DataColumn(label: Text('user')),
+            // DataColumn(
+            //   label: Text('price'),
+            //   onSort: (columnIndex, ascending) {
+            //     setState(() {
+            //       _currentSortColumn = columnIndex;
+            //       _isAscending = ascending;
+            //       if (ascending) {
+            //         _products.sort((a, b) => b['price'].compareTo(a['price']));
+            //       } else {
+            //         _products.sort((a, b) => a['price'].compareTo(b['price']));
+            //       }
+            //     });
+            //   },
+            // ),
             DataColumn(label: Text('edit')),
           ],
-          rows: _products.map((item) {
+          rows: kontenProvider.filterKontens.map((konten) {
+            // if (konten.userId == user.id) {
+            //   filterKonten = DataRow(cells: []);
+            // }
             return DataRow(cells: [
-              DataCell(Text(item['id'].toString())),
-              DataCell(Text(item['name'])),
-              DataCell(Text(item['price'].toString())),
+              DataCell(Text('${konten.id}')),
+              DataCell(Text('${konten.judul}')),
+              DataCell(Text('${konten.jenis}')),
+              DataCell(Text('${konten.user?.name}')),
               DataCell(
                 Row(
                   children: [
@@ -163,7 +212,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditKontenPage(item),
+                            builder: (context) => EditKontenPage(konten, user),
                           ),
                         );
                       },
@@ -180,7 +229,8 @@ class _UserKontenPageState extends State<UserKontenPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        showDeleteDialog(item['id'], item['name']);
+                        showDeleteDialog(
+                            konten.id.toString(), konten.judul.toString());
                       },
                       child: Container(
                         color: Colors.redAccent,
@@ -195,6 +245,51 @@ class _UserKontenPageState extends State<UserKontenPage> {
               )
             ]);
           }).toList(),
+          // rows: _products.map((item) {
+          //   return DataRow(cells: [
+          //     DataCell(Text(item['id'].toString())),
+          //     DataCell(Text(item['name'])),
+          //     DataCell(Text(item['price'].toString())),
+          //     DataCell(
+          //       Row(
+          //         children: [
+          //           GestureDetector(
+          //             onTap: () {
+          //               Navigator.push(
+          //                 context,
+          //                 MaterialPageRoute(
+          //                   builder: (context) => EditKontenPage(item),
+          //                 ),
+          //               );
+          //             },
+          //             child: Container(
+          //               color: Colors.blueAccent,
+          //               child: Icon(
+          //                 Icons.edit,
+          //                 color: whiteTextColor,
+          //               ),
+          //             ),
+          //           ),
+          //           SizedBox(
+          //             width: 10,
+          //           ),
+          //           GestureDetector(
+          //             onTap: () {
+          //               showDeleteDialog(item['id'], item['name']);
+          //             },
+          //             child: Container(
+          //               color: Colors.redAccent,
+          //               child: Icon(
+          //                 Icons.delete,
+          //                 color: whiteTextColor,
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     )
+          //   ]);
+          // }).toList(),
         ),
       );
     }

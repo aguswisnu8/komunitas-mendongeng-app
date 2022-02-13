@@ -2,7 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/providers/konten_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class AddKontenPage extends StatefulWidget {
   @override
@@ -26,8 +30,63 @@ class _AddKontenPageState extends State<AddKontenPage> {
   TextEditingController deskripsiController = TextEditingController(text: '');
 
   String? jenisKonten = '';
+  bool isLoading = false;
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+
+    addKonten() async {
+      setState(() {
+        isLoading = true;
+      });
+      // print(judulController.text);
+      // print(linkController.text);
+      // print(_image.path);
+      // print(deskripsiController.text);
+      // print(jenisKonten);
+
+      if (await kontenProvider.addKonten(
+        judul: judulController.text,
+        filePath: _image.path,
+        link: linkController.text,
+        deskripsi: deskripsiController.text,
+        jenis: jenisKonten,
+        status: 1,
+        token: authProvider.user.token,
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: primaryColor,
+            content: Text(
+              'Berhasil Menambahkan Konten Baru',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Menambahkan Kegiatan Baru',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     Widget judul() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -57,6 +116,12 @@ class _AddKontenPageState extends State<AddKontenPage> {
                       child: TextFormField(
                         controller: judulController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Judul Konten',
                             hintStyle: greyTextStyle),
@@ -171,6 +236,14 @@ class _AddKontenPageState extends State<AddKontenPage> {
                       child: TextFormField(
                         controller: linkController,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (jenisKonten == 'video') {
+                            if (value == null || value.isEmpty) {
+                              return 'Tidak Boleh Kosong';
+                            }
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Masukkan Link Youtube Video ',
                             hintStyle: greyTextStyle),
@@ -217,6 +290,12 @@ class _AddKontenPageState extends State<AddKontenPage> {
                         controller: deskripsiController,
                         keyboardType: TextInputType.multiline,
                         style: blackTextStyle,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Tidak Boleh Kosong';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration.collapsed(
                             hintText: 'Deskripsi / Isi Konten',
                             hintStyle: greyTextStyle),
@@ -294,8 +373,25 @@ class _AddKontenPageState extends State<AddKontenPage> {
         child: TextButton(
             onPressed: () {
               // Navigator.pushNamed(context, '/home');
-              Navigator.pop(context);
+              // Navigator.pop(context);
               // handleSignUp();
+              if (_formKey.currentState!.validate() &&
+                  _image != null &&
+                  jenisKonten!.isNotEmpty) {
+                addKonten();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 1),
+                    backgroundColor: Colors.redAccent,
+                    content: Text(
+                      'Terdapat data yang masih kosong',
+                      style: whiteTextStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
             },
             style: TextButton.styleFrom(
               backgroundColor: primaryColor,
@@ -317,12 +413,19 @@ class _AddKontenPageState extends State<AddKontenPage> {
         width: double.infinity,
         child: ListView(
           children: [
-            judul(),
-            gambar(),
-            jenis(),
-            jenisKonten == 'video' ? link() : SizedBox(),
-            deskripsi(),
-            addButton(),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  judul(),
+                  gambar(),
+                  jenis(),
+                  jenisKonten == 'video' ? link() : SizedBox(),
+                  deskripsi(),
+                ],
+              ),
+            ),
+            isLoading ? LoadingButton() : addButton(),
             SizedBox(
               height: defaultMargin,
             ),

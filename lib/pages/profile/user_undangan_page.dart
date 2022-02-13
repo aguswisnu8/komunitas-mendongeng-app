@@ -1,7 +1,15 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+
+import 'package:kom_mendongeng/models/undangan_model.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/pages/crud/edit_undangan_page.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+
+import 'package:kom_mendongeng/providers/undangan_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class UserUndanganPage extends StatefulWidget {
   @override
@@ -9,6 +17,17 @@ class UserUndanganPage extends StatefulWidget {
 }
 
 class _UserUndanganPageState extends State<UserUndanganPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    getInit();
+    super.initState();
+  }
+
+  getInit() async {
+    await Provider.of<UndanganProvider>(context, listen: false).getUndangans();
+  }
+
   final List<Map> _products = List.generate(10, (i) {
     return {"id": i, "name": "Product $i", "price": Random().nextInt(200) + 1};
   });
@@ -18,6 +37,21 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
 
   @override
   Widget build(BuildContext context) {
+    UndanganProvider undanganProvider = Provider.of<UndanganProvider>(context);
+
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserModel user = authProvider.user;
+
+    List<UndanganModel> filterUndangan = [];
+    undanganProvider.undangans.map((e) {
+      if (e.userId == user.id) {
+        // if (e.userId == 4) {
+        filterUndangan.add(e);
+      }
+    }).toList();
+
+    print('panjangn Undangan ${filterUndangan.length}');
+
     Future<void> showDeleteDialog(int id, String name) {
       return showDialog(
         context: context,
@@ -45,7 +79,7 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Konten $id',
+                    'Hapus Undangan $id',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,
@@ -106,7 +140,9 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
         margin: EdgeInsets.only(top: 30),
         child: TextButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/add-undangan');
+              Navigator.pushNamed(context, '/add-undangan').then((value) {
+                getInit();
+              });
               // Navigator.pop(context);
             },
             style: TextButton.styleFrom(
@@ -132,35 +168,61 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
           sortAscending: _isAscending,
           // border: ,
           columns: [
-            DataColumn(label: Text('id')),
-            DataColumn(label: Text('name')),
             DataColumn(
-              label: Text('price'),
+              label: Text('id'),
               onSort: (columnIndex, ascending) {
                 setState(() {
                   _currentSortColumn = columnIndex;
                   _isAscending = ascending;
                   if (ascending) {
-                    _products.sort((a, b) => b['price'].compareTo(a['price']));
+                    undanganProvider.undangans
+                        .sort((a, b) => b.id!.toInt().compareTo(a.id!.toInt()));
                   } else {
-                    _products.sort((a, b) => a['price'].compareTo(b['price']));
+                    undanganProvider.undangans
+                        .sort((a, b) => a.id!.toInt().compareTo(b.id!.toInt()));
                   }
                 });
               },
             ),
+            DataColumn(label: Text('instansi')),
+            DataColumn(label: Text('kegiatan')),
+            DataColumn(label: Text('jenis')),
+            DataColumn(label: Text('user')),
+            DataColumn(label: Text('kontak')),
             DataColumn(label: Text('edit')),
+            // DataColumn(label: Text('id')),
+            // DataColumn(label: Text('name')),
+            // DataColumn(
+            //   label: Text('price'),
+            //   onSort: (columnIndex, ascending) {
+            //     setState(() {
+            //       _currentSortColumn = columnIndex;
+            //       _isAscending = ascending;
+            //       if (ascending) {
+            //         _products.sort((a, b) => b['price'].compareTo(a['price']));
+            //       } else {
+            //         _products.sort((a, b) => a['price'].compareTo(b['price']));
+            //       }
+            //     });
+            //   },
+            // ),
+            // DataColumn(label: Text('edit')),
           ],
-          rows: _products.map((item) {
+          rows: filterUndangan.map((undangan) {
             return DataRow(cells: [
-              DataCell(Text(item['id'].toString())),
-              DataCell(Text(item['name'])),
-              DataCell(Text(item['price'].toString())),
+              DataCell(Text('${undangan.id}')),
+              DataCell(Text('${undangan.penyelenggara}')),
+              DataCell(Text('${undangan.nmKegiatan}')),
+              DataCell(Text('${undangan.jenis}')),
+              DataCell(Text('${undangan.user?.name}')),
+              DataCell(Text('${undangan.contact}')),
               DataCell(
                 Row(
                   children: [
                     GestureDetector(
                       onTap: () {
-                        showDeleteDialog(item['id'], item['name']);
+                        showDeleteDialog(undangan.id!.toInt(),
+                            undangan.nmKegiatan.toString());
                       },
                       child: Container(
                         color: Colors.redAccent,
@@ -175,6 +237,31 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
               )
             ]);
           }).toList(),
+          // rows: _products.map((item) {
+          //   return DataRow(cells: [
+          //     DataCell(Text(item['id'].toString())),
+          //     DataCell(Text(item['name'])),
+          //     DataCell(Text(item['price'].toString())),
+          //     DataCell(
+          //       Row(
+          //         children: [
+          //           GestureDetector(
+          //             onTap: () {
+          //               showDeleteDialog(item['id'], item['name']);
+          //             },
+          //             child: Container(
+          //               color: Colors.redAccent,
+          //               child: Icon(
+          //                 Icons.delete,
+          //                 color: whiteTextColor,
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     )
+          //   ]);
+          // }).toList(),
         ),
       );
     }

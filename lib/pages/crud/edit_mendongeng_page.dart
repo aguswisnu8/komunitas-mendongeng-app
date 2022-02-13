@@ -2,13 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/mendongeng_model.dart';
+import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditMendongengPage extends StatefulWidget {
-  late final Map products;
-  EditMendongengPage(this.products);
+  // late final Map products;
+  late final MendongengModel mendongeng;
+  late final UserModel user;
+  EditMendongengPage(this.mendongeng, this.user);
 
   @override
   State<EditMendongengPage> createState() => _EditMendongengPageState();
@@ -39,13 +44,29 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     imagePicker = new ImagePicker();
+
+    nameController.text = widget.mendongeng.name.toString();
+    lokasiController.text = widget.mendongeng.lokasi.toString();
+    deskripsiController.text = widget.mendongeng.deskripsi.toString();
+    tglController.text = widget.mendongeng.tgl.toString();
+    partnerController.text = widget.mendongeng.partner.toString();
+    gmapController.text = widget.mendongeng.gmapLink.toString();
+    expReqController.text = widget.mendongeng.expReq.toString();
+    stReqController.text = widget.mendongeng.stReq.toString();
+    jenisKegiatan = widget.mendongeng.jenis;
+    statusKegiatan = widget.mendongeng.status;
   }
 
   String? jenisKegiatan = '';
+  String? pathGambarKegiatan = '';
   int? statusKegiatan = 1;
+
   @override
   Widget build(BuildContext context) {
+  
+
     Widget namaKegiatan() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -204,14 +225,22 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
                             height: 200.0,
                             fit: BoxFit.fitHeight,
                           )
-                        : Container(
-                            decoration: BoxDecoration(color: backgroundColor),
-                            width: 200,
-                            height: 200,
-                            child: Icon(
-                              Icons.camera_alt,
-                            ),
-                          ),
+                        : cekImage(widget.mendongeng.gambar.toString())
+                            ? Image.network(
+                                '${widget.mendongeng.gambar}',
+                                width: 200.0,
+                                height: 200.0,
+                                fit: BoxFit.fitHeight,
+                              )
+                            : Container(
+                                decoration:
+                                    BoxDecoration(color: backgroundColor),
+                                width: 200,
+                                height: 200,
+                                child: Icon(
+                                  Icons.camera_alt,
+                                ),
+                              ),
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
@@ -225,6 +254,7 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
                       setState(() {
                         _image = File(image!.path);
                       });
+                      pathGambarKegiatan = image!.path;
                       print('isi file _image $_image');
                       // print('path _image ${_image.toString()}');
                     },
@@ -280,14 +310,17 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
                       print('confirm $date');
                       setState(() {
                         tglController.text =
-                            '${date.year}-${date.month}-${date.day}';
+                            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
                       });
                     },
                     currentTime: DateTime.now(),
                   );
                 },
                 child: Text(
+                  // nameController.text,
                   tglController.text,
+                  // jenisKegiatan.toString(),
+                  // 'adsda',
                   style: blackTextStyle.copyWith(fontWeight: semiBold),
                 ),
               ),
@@ -561,9 +594,12 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
         margin: EdgeInsets.only(top: 30),
         child: TextButton(
           onPressed: () {
-            // Navigator.pushNamed(context, '/home');
-            Navigator.pop(context);
-            // handleSignUp();
+            // Navigator.pop(context);
+            print(tglController.text);
+            print(nameController.text);
+            print(deskripsiController.text);
+            print(lokasiController.text);
+            print(jenisKegiatan);
           },
           style: TextButton.styleFrom(
             backgroundColor: primaryColor,
