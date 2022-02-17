@@ -66,11 +66,13 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
     }
 
     handleAddPartispan(String peran) async {
+      print('st req = ${widget.mendongeng.stReq!}');
       Navigator.pop(context);
       loadingDialog();
       List response = await partisipanProvider.addPartisipan(
         widget.mendongeng.id!,
         peran,
+        widget.mendongeng.stReq!,
         authProvider.user.token.toString(),
       );
       if (response[1] == true) {
@@ -130,7 +132,7 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
                       fit: BoxFit.cover,
                     )
                   : DecorationImage(
-                      image: AssetImage('assets/image_test.jpg'),
+                      image: AssetImage('assets/bali_mendongeng.png'),
                       fit: BoxFit.cover,
                     ),
             ),

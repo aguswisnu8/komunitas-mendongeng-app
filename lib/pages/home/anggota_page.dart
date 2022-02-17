@@ -4,9 +4,13 @@ import 'package:kom_mendongeng/providers/anggota_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:provider/provider.dart';
 
-class AnggotaPage extends StatelessWidget {
-  // const MendongengPage({ Key? key }) : super(key: key);
+class AnggotaPage extends StatefulWidget {
+  @override
+  State<AnggotaPage> createState() => _AnggotaPageState();
+}
 
+class _AnggotaPageState extends State<AnggotaPage> {
+  // const MendongengPage({ Key? key }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     AnggotaProvider anggotaProvider = Provider.of<AnggotaProvider>(context);
@@ -60,23 +64,31 @@ class AnggotaPage extends StatelessWidget {
           header(),
         ];
       },
-      body: ListView(
-        children: [
-          deskripsi(),
-          Column(
-            children: anggotaProvider.anggotas
-                .map(
-                  (anggota) => AnggotaCard(anggota),
-                )
-                .toList(),
-          ),
-          SizedBox(
-            height: defaultMargin,
-          )
-          // AnggotaCard(),
-          // AnggotaCard(),
-          // AnggotaCard(),
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Provider.of<AnggotaProvider>(context, listen: false)
+              .getanggotas();
+
+          setState(() {});
+        },
+        child: ListView(
+          children: [
+            deskripsi(),
+            Column(
+              children: anggotaProvider.anggotas
+                  .map(
+                    (anggota) => AnggotaCard(anggota),
+                  )
+                  .toList(),
+            ),
+            SizedBox(
+              height: defaultMargin,
+            )
+            // AnggotaCard(),
+            // AnggotaCard(),
+            // AnggotaCard(),
+          ],
+        ),
       ),
     );
   }

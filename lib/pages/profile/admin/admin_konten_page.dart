@@ -21,12 +21,80 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
   int _currentSortColumn = 0;
   bool _isAscending = false;
 
+  getInit() async {
+    await Provider.of<KontenProvider>(context, listen: false).getKontens();
+  }
+
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     UserModel user = authProvider.user;
 
     KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+
+    Future<void> loadingDialog() {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => Container(
+          // width: MediaQuery.of(context).size.width - (4 * defaultMargin),
+          width: 200,
+          child: AlertDialog(
+            backgroundColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: defaultMargin),
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    deleteKonten(int id) async {
+      loadingDialog();
+      if (await kontenProvider.deleteKonten(
+        id,
+        authProvider.user.token.toString(),
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.green[400],
+            content: Text(
+              'Konten id: $id berhasil dihapus',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Menghapus Konten id: $id',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      Navigator.pop(context);
+    }
 
     Future<void> showDeleteDialog(int id, String name) {
       return showDialog(
@@ -55,11 +123,14 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Konten $id',
+                    'Hapus konten id $id',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,
                     ),
+                  ),
+                  Divider(
+                    thickness: 1,
                   ),
                   Text(
                     name,
@@ -76,17 +147,7 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
                       onPressed: () {
                         Navigator.pop(context);
                         // print('peserta');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            duration: Duration(seconds: 1),
-                            backgroundColor: Colors.green[400],
-                            content: Text(
-                              'Konten id: $id berhasil dihapus',
-                              style: whiteTextStyle,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
+                        deleteKonten(id);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.redAccent,
@@ -174,7 +235,10 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
                           MaterialPageRoute(
                             builder: (context) => EditKontenPage(konten, user),
                           ),
-                        );
+                        ).then((value) async {
+                          await getInit();
+                          setState(() {});
+                        });
                       },
                       child: Container(
                         color: Colors.blueAccent,
@@ -189,8 +253,12 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        showDeleteDialog(
-                            konten.id!.toInt(), konten.judul.toString());
+                        showDeleteDialog(konten.id!,
+                                '${konten.jenis} dongeng - ${konten.judul}')
+                            .then((value) async {
+                          await getInit();
+                          setState(() {});
+                        });
                       },
                       child: Container(
                         color: Colors.redAccent,
@@ -288,7 +356,13 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: content(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await getInit();
+          setState(() {});
+        },
+        child: content(),
+      ),
     );
   }
 }

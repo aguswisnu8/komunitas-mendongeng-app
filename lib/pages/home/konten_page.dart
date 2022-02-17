@@ -5,9 +5,13 @@ import 'package:kom_mendongeng/providers/konten_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:provider/provider.dart';
 
-class KontenPage extends StatelessWidget {
-  // const MendongengPage({ Key? key }) : super(key: key);
+class KontenPage extends StatefulWidget {
+  @override
+  State<KontenPage> createState() => _KontenPageState();
+}
 
+class _KontenPageState extends State<KontenPage> {
+  // const MendongengPage({ Key? key }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
@@ -61,24 +65,31 @@ class KontenPage extends StatelessWidget {
           header(),
         ];
       },
-      body: ListView(
-        children: [
-          subTitle(),
-          Column(
-            children: kontenProvider.kontens
-                .map((konten) => KontenTile(konten))
-                .toList(),
-          ),
-          // KontenTile(),
-          // KontenTile(),
-          // KontenTile(),
-          // KontenTile(),
-          // KontenTile(),
-          // KontenTile(),
-          SizedBox(
-            height: defaultMargin,
-          ),
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Provider.of<KontenProvider>(context, listen: false)
+              .getKontens();
+          setState(() {});
+        },
+        child: ListView(
+          children: [
+            subTitle(),
+            Column(
+              children: kontenProvider.kontens
+                  .map((konten) => KontenTile(konten))
+                  .toList(),
+            ),
+            // KontenTile(),
+            // KontenTile(),
+            // KontenTile(),
+            // KontenTile(),
+            // KontenTile(),
+            // KontenTile(),
+            SizedBox(
+              height: defaultMargin,
+            ),
+          ],
+        ),
       ),
     );
   }

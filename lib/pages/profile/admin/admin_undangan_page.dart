@@ -20,7 +20,7 @@ class _AdminUndanganPageState extends State<AdminUndanganPage> {
     super.initState();
   }
 
-  getInit() async {
+  Future<void> getInit() async {
     await Provider.of<UndanganProvider>(context, listen: false).getUndangans();
   }
 
@@ -37,89 +37,6 @@ class _AdminUndanganPageState extends State<AdminUndanganPage> {
 
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     UserModel user = authProvider.user;
-
-    Future<void> showDeleteDialog(int id, String name) {
-      return showDialog(
-        context: context,
-        builder: (BuildContext context) => Container(
-          width: MediaQuery.of(context).size.width - (2 * defaultMargin),
-          child: AlertDialog(
-            backgroundColor: primaryColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(
-                        Icons.close,
-                        color: whiteTextColor,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Hapus Konten $id',
-                    style: whiteTextStyle.copyWith(
-                      fontSize: 16,
-                      fontWeight: semiBold,
-                    ),
-                  ),
-                  Text(
-                    name,
-                    style: whiteTextStyle.copyWith(
-                      fontSize: 18,
-                      fontWeight: semiBold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 6,
-                  ),
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // print('peserta');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            duration: Duration(seconds: 1),
-                            backgroundColor: primaryColor,
-                            content: Text(
-                              'Konten berhasil dihapus',
-                              style: whiteTextStyle,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'Hapus',
-                        style: whiteTextStyle.copyWith(
-                          fontSize: 16,
-                          fontWeight: medium,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
 
     Widget tableKonten() {
       return SingleChildScrollView(
@@ -191,7 +108,10 @@ class _AdminUndanganPageState extends State<AdminUndanganPage> {
                             builder: (context) =>
                                 EditUndanganPage(undangan, user),
                           ),
-                        );
+                        ).then((value) async {
+                          await getInit();
+                          setState(() {});
+                        });
                       },
                       child: Container(
                         color: Colors.blueAccent,
@@ -277,7 +197,13 @@ class _AdminUndanganPageState extends State<AdminUndanganPage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: content(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await getInit();
+          setState(() {});
+        },
+        child: content(),
+      ),
     );
   }
 }

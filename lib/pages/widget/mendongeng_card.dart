@@ -42,6 +42,16 @@ class MendongengCard extends StatelessWidget {
                       width: 360,
                       height: 202,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 360,
+                          height: 202,
+                          color: Color(0xffD1D1D1),
+                          child: Center(
+                            child: Text('Can\'t Load Image'),
+                          ),
+                        );
+                      },
                     ),
                   )
                 : ClipRRect(
@@ -50,7 +60,7 @@ class MendongengCard extends StatelessWidget {
                       topRight: Radius.circular(20),
                     ),
                     child: Image.asset(
-                      'assets/image_test.jpg',
+                      'assets/bali_mendongeng.png',
                       width: 360,
                       height: 202,
                       fit: BoxFit.cover,

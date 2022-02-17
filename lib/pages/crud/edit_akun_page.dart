@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/models/anggota_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/anggota_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class EditAkunPage extends StatefulWidget {
   // late final Map products;
@@ -25,8 +28,52 @@ class _EditAkunPageState extends State<EditAkunPage> {
     userLevel = widget.anggota.level;
   }
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
+    AnggotaProvider anggotaProvider = Provider.of<AnggotaProvider>(context);
+
+    editLevelAkun() async {
+      setState(() {
+        isLoading = true;
+      });
+      if (await anggotaProvider.editLevelAnggota(
+        widget.anggota.id!,
+        userLevel.toString(),
+        _groupValue!,
+        widget.user.token.toString(),
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: primaryColor,
+            content: Text(
+              'Berhasil Memperbaharui User',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Memperbaharui User',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     Widget headerText() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -167,7 +214,11 @@ class _EditAkunPageState extends State<EditAkunPage> {
         child: TextButton(
             onPressed: () {
               // Navigator.pushNamed(context, '/home');
-              Navigator.pop(context);
+              if (userLevel != widget.anggota.level) {
+                editLevelAkun();
+              } else {
+                Navigator.pop(context);
+              }
             },
             style: TextButton.styleFrom(
               backgroundColor: primaryColor,
@@ -192,7 +243,7 @@ class _EditAkunPageState extends State<EditAkunPage> {
             headerText(),
             peranUser(),
             activeStatus(),
-            editButton(),
+            isLoading ? LoadingButton() : editButton(),
             SizedBox(
               height: defaultMargin,
             ),

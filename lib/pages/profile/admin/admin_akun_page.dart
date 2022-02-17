@@ -20,6 +20,11 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
 
   int _currentSortColumn = 0;
   bool _isAscending = false;
+  
+
+  getInit() async {
+    await Provider.of<AnggotaProvider>(context, listen: false).getanggotas();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +32,70 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
     UserModel user = authProvider.user;
 
     AnggotaProvider anggotaProvider = Provider.of<AnggotaProvider>(context);
+
+    Future<void> loadingDialog() {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => Container(
+          // width: MediaQuery.of(context).size.width - (4 * defaultMargin),
+          width: 200,
+          child: AlertDialog(
+            backgroundColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: defaultMargin),
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    deleteAnggota(int id) async {
+      loadingDialog();
+      if (await anggotaProvider.deleteAnggota(
+        id,
+        authProvider.user.token.toString(),
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.green[400],
+            content: Text(
+              'Akun id: $id berhasil dihapus',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Menghapus Akun id: $id',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      Navigator.pop(context);
+    }
 
     Future<void> showDeleteDialog(int id, String name) {
       return showDialog(
@@ -55,11 +124,14 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Konten $id',
+                    'Hapus Akun id $id',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,
                     ),
+                  ),
+                  Divider(
+                    thickness: 1,
                   ),
                   Text(
                     name,
@@ -76,17 +148,7 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
                       onPressed: () {
                         Navigator.pop(context);
                         // print('peserta');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            duration: Duration(seconds: 1),
-                            backgroundColor: Colors.green[400],
-                            content: Text(
-                              'Akun id: $id berhasil dihapus',
-                              style: whiteTextStyle,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
+                        deleteAnggota(id);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.redAccent,
@@ -176,7 +238,10 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
                           MaterialPageRoute(
                             builder: (context) => EditAkunPage(anggota, user),
                           ),
-                        );
+                        ).then((value) async {
+                          await getInit();
+                          setState(() {});
+                        });
                       },
                       child: Container(
                         color: Colors.blueAccent,
@@ -191,7 +256,11 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        showDeleteDialog(anggota.id!, anggota.email.toString());
+                        showDeleteDialog(anggota.id!, '${anggota.name} | ${anggota.email}')
+                            .then((value) async {
+                          await getInit();
+                          setState(() {});
+                        });
                       },
                       child: Container(
                         color: Colors.redAccent,
@@ -290,7 +359,13 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: content(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await getInit();
+          setState(() {});
+        },
+        child: content(),
+      ),
     );
   }
 }

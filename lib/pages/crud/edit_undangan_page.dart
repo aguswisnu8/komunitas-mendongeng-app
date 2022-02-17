@@ -3,8 +3,11 @@ import 'package:kom_mendongeng/models/undangan_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/pages/crud/add_mendongeng_from_undangan_page.dart';
 import 'package:kom_mendongeng/pages/profile/user_undangan_page.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/undangan_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:provider/provider.dart';
 
 class EditUndanganPage extends StatefulWidget {
   // late final Map products;
@@ -26,8 +29,61 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
     statusUndangan = widget.undangan.status;
   }
 
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
+    UndanganProvider undanganProvider = Provider.of<UndanganProvider>(context);
+
+    editUndangan() async {
+      setState(() {
+        isLoading = true;
+      });
+      if (await undanganProvider.editStatusUndangan(
+        widget.undangan.id!,
+        statusUndangan.toString(),
+        widget.user.token.toString(),
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: primaryColor,
+            content: Text(
+              'Berhasil Mengubah Status Undangan',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        if (statusUndangan == 'terima') {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AddMendongengFromUndanganPage(widget.undangan),
+            ),
+          );
+        }
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Mengubah Status Undangan',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     Widget headerText() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -218,15 +274,20 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
         child: TextButton(
             onPressed: () {
               // Navigator.pushNamed(context, '/home');
-              if (statusUndangan == 'terima') {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AddMendongengFromUndanganPage(widget.undangan),
-                  ),
-                );
+              if (statusUndangan != widget.undangan.status) {
+                print('masuk edit');
+                editUndangan();
+                // if (statusUndangan == 'terima') {
+                //   Navigator.pop(context);
+                //   Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) =>
+                //           AddMendongengFromUndanganPage(widget.undangan),
+                //     ),
+                //   );
+                // }
+                // Navigator.pop(context);
               } else {
                 Navigator.pop(context);
               }
@@ -254,7 +315,11 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
           children: [
             headerText(),
             status(),
-            widget.undangan.status == 'terima' ? SizedBox() : editButton(),
+            widget.undangan.status == 'terima'
+                ? SizedBox()
+                : isLoading
+                    ? LoadingButton()
+                    : editButton(),
             SizedBox(
               height: defaultMargin,
             ),

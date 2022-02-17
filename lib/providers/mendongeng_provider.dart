@@ -74,4 +74,65 @@ class MendongengProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> editMendongeng({
+    int? id,
+    String? name,
+    String? lokasi,
+    String? tgl,
+    String? deskripsi,
+    String? filePath,
+    String? partner,
+    String? jenis,
+    int? status,
+    String? gmapLink,
+    int? expReq,
+    int? stReq,
+    String? token,
+  }) async {
+    try {
+      if (await MendongengService().editMendongeng(
+        id: id,
+        name: name,
+        lokasi: lokasi,
+        tgl: tgl,
+        deskripsi: deskripsi,
+        filePath: filePath,
+        partner: partner,
+        jenis: jenis,
+        status: status,
+        gmapLink: gmapLink,
+        expReq: expReq,
+        stReq: stReq,
+        token: token,
+      )) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> deleteMendongeng(
+    int id,
+    String token,
+  ) async {
+    try {
+      if (await MendongengService().deleteMendongeng(
+        id,
+        token,
+      )) {
+        return true;
+      } else {
+        return false;
+      }
+      // return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 }

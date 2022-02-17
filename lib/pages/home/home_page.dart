@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/konten_model.dart';
 import 'package:kom_mendongeng/pages/widget/konten_tile.dart';
 import 'package:kom_mendongeng/pages/widget/mendongeng_tile.dart';
 import 'package:kom_mendongeng/providers/konten_provider.dart';
@@ -19,6 +20,8 @@ class _HomePageState extends State<HomePage> {
         Provider.of<MendongengProvider>(context);
 
     KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+
+    Iterable<KontenModel> topKonten = kontenProvider.kontens.take(5);
 
     Widget header() {
       return Container(
@@ -161,25 +164,6 @@ class _HomePageState extends State<HomePage> {
                       fontWeight: semiBold,
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: secondaryColor,
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        print(commingDay('2022-03'));
-                      },
-                      child: Text(
-                        'telusuri',
-                        style: whiteTextStyle.copyWith(
-                          fontSize: 16,
-                          fontWeight: medium,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -192,11 +176,16 @@ class _HomePageState extends State<HomePage> {
                   width: 16,
                 ),
                 Column(
-                  children: kontenProvider.kontens
+                  children: topKonten
                       .map(
                         (konten) => KontenTile(konten),
                       )
                       .toList(),
+                  // children: kontenProvider.kontens
+                  //     .map(
+                  //       (konten) => KontenTile(konten),
+                  //     )
+                  //     .toList(),
                   // children: [
                   //   KontenTile(),
                   //   KontenTile(),
@@ -314,16 +303,24 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    return ListView(
-      children: [
-        header(),
-        mendongeng(),
-        subtitle(),
-        konten(),
-        findMe(),
-      ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        await Provider.of<MendongengProvider>(context, listen: false)
+            .getMendongengs();
+
+        await Provider.of<KontenProvider>(context, listen: false).getKontens();
+
+        setState(() {});
+      },
+      child: ListView(
+        children: [
+          header(),
+          mendongeng(),
+          subtitle(),
+          konten(),
+          findMe(),
+        ],
+      ),
     );
   }
 }
-
-

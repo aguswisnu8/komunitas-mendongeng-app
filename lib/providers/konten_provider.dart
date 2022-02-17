@@ -69,4 +69,55 @@ class KontenProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> editKonten({
+    int? id,
+    String? judul,
+    String? filePath,
+    String? link,
+    String? deskripsi,
+    String? jenis,
+    int? status,
+    String? token,
+  }) async {
+    try {
+      if (await KontenService().editKonten(
+        id: id,
+        judul: judul,
+        filePath: filePath,
+        link: link,
+        deskripsi: deskripsi,
+        jenis: jenis,
+        status: status,
+        token: token,
+      )) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> deleteKonten(
+    int id,
+    String token,
+  ) async {
+    try {
+      if (await KontenService().deleteKonten(
+        id,
+        token,
+      )) {
+        return true;
+      } else {
+        return false;
+      }
+      // return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 }

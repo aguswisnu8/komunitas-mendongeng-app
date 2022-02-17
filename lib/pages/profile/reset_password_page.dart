@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
 import 'package:kom_mendongeng/providers/auth_provider.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:provider/provider.dart';
@@ -13,10 +14,50 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   TextEditingController newPassController = TextEditingController(text: '');
   TextEditingController cofirmPassController = TextEditingController(text: '');
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     UserModel user = authProvider.user;
+    resetPassword() async {
+      setState(() {
+        isLoading = true;
+      });
+      if (await authProvider.resetPassword(
+        newPassController.text,
+        user.token.toString(),
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: primaryColor,
+            content: Text(
+              'Berhasil Mereset Password',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Mereset Password',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     Widget newPassword() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -116,8 +157,22 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: TextButton(
             onPressed: () {
               // Navigator.pushNamed(context, '/home');
-              Navigator.pop(context);
-              // handleSignUp();
+              // Navigator.pop(context);
+              if (newPassController.text == cofirmPassController.text) {
+                resetPassword();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 1),
+                    backgroundColor: Colors.redAccent,
+                    content: Text(
+                      'Confirm Password Tidak Sama',
+                      style: whiteTextStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
             },
             style: TextButton.styleFrom(
               backgroundColor: primaryColor,
@@ -141,7 +196,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           children: [
             newPassword(),
             confirmPassword(),
-            resetButton(),
+            isLoading ? LoadingButton() : resetButton(),
             SizedBox(
               height: defaultMargin,
             ),

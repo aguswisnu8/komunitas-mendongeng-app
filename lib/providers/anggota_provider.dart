@@ -19,4 +19,42 @@ class AnggotaProvider with ChangeNotifier {
       print(e);
     }
   }
+
+  Future<bool> editLevelAnggota(
+    int id,
+    String level,
+    int active,
+    String token,
+  ) async {
+    try {
+      if (await AnggotaService().editLevelAnggota(id, level, active, token)) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> deleteAnggota(
+    int id,
+    String token,
+  ) async {
+    try {
+      if (await AnggotaService().deleteAnggota(
+        id,
+        token,
+      )) {
+        return true;
+      } else {
+        return false;
+      }
+      // return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 }

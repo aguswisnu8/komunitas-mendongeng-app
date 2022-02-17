@@ -73,4 +73,50 @@ class UndanganService {
       throw Exception('Gagal Mendata Partisipan');
     }
   }
+
+  Future<bool> editStatusUndangan(
+    int id,
+    String status,
+    String token,
+  ) async {
+    var url = '$baseUrl/undangans/$id';
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    };
+    var body = jsonEncode({
+      'status': status,
+    });
+    var response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+
+    print(response.body);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Gagal Memperbaharui Status Undangan');
+    }
+  }
+
+  Future<bool> deleteUndangan(int id, String token) async {
+    var url = '$baseUrl/undangans/$id';
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    };
+    var response = await http.delete(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    print(response.body);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Gagal Menghapus Undangan');
+    }
+  }
 }

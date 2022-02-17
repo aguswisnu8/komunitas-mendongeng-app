@@ -54,4 +54,41 @@ class UndanganProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> editStatusUndangan(
+    int id,
+    String status,
+    String token,
+  ) async {
+    try {
+      if (await UndanganService().editStatusUndangan(id, status, token)) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> deleteUndangan(
+    int id,
+    String token,
+  ) async {
+    try {
+      if (await UndanganService().deleteUndangan(
+        id,
+        token,
+      )) {
+        return true;
+      } else {
+        return false;
+      }
+      // return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 }

@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kom_mendongeng/models/konten_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/konten_provider.dart';
 import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class EditKontenPage extends StatefulWidget {
   late final KontenModel konten;
@@ -19,6 +22,16 @@ class _EditKontenPageState extends State<EditKontenPage> {
   var _image;
   var imagePicker;
   // late XFile a;
+  String? jenisKonten = '';
+  String? pathGambarKonten = '';
+  int? statusKonten = 1;
+  TextEditingController judulController =
+      TextEditingController(text: 'Mendongeng Bersama Kak Dekdus');
+  TextEditingController linkController =
+      TextEditingController(text: 'sadasdasdasdad');
+  TextEditingController deskripsiController = TextEditingController(
+      text:
+          'Mendongeng Bersama Kak Dekdus Mendongeng Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus ');
 
   @override
   void initState() {
@@ -33,19 +46,101 @@ class _EditKontenPageState extends State<EditKontenPage> {
     statusKonten = widget.konten.status;
   }
 
-  String? jenisKonten = '';
-  String? pathGambarKonten = '';
-  int? statusKonten = 1;
-  TextEditingController judulController =
-      TextEditingController(text: 'Mendongeng Bersama Kak Dekdus');
-  TextEditingController linkController =
-      TextEditingController(text: 'sadasdasdasdad');
-  TextEditingController deskripsiController = TextEditingController(
-      text:
-          'Mendongeng Bersama Kak Dekdus Mendongeng Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus Bersama Kak Dekdus ');
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
+    KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+
+    editKonten() async {
+      setState(() {
+        isLoading = true;
+      });
+      // print(judulController.text);
+      // print(_image);
+      // print(jenisKonten);
+      // print(linkController.text);
+      // print(deskripsiController.text);
+      // print(statusKonten);
+      if (_image != null) {
+        print('ganti image');
+        if (await kontenProvider.editKonten(
+          id: widget.konten.id,
+          judul: judulController.text,
+          filePath: _image.path,
+          link: linkController.text,
+          deskripsi: deskripsiController.text,
+          jenis: jenisKonten,
+          status: statusKonten,
+          token: widget.user.token,
+        )) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: primaryColor,
+              content: Text(
+                'Berhasil Memperbaharui Konten',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.redAccent,
+              content: Text(
+                'Gagal Mengubah Konten',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+      } else {
+        print('image kosong');
+        if (await kontenProvider.editKonten(
+          id: widget.konten.id,
+          judul: judulController.text,
+          link: linkController.text,
+          deskripsi: deskripsiController.text,
+          jenis: jenisKonten,
+          status: statusKonten,
+          token: widget.user.token,
+        )) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: primaryColor,
+              content: Text(
+                'Berhasil Memperbaharui Konten',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.redAccent,
+              content: Text(
+                'Gagal Mengubah Konten',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     Widget judul() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -336,9 +431,15 @@ class _EditKontenPageState extends State<EditKontenPage> {
         margin: EdgeInsets.only(top: 30),
         child: TextButton(
             onPressed: () {
-              // Navigator.pushNamed(context, '/home');
-              Navigator.pop(context);
+              // String? t;
+              // t = 'asdadsa';
+              // print(t == null || t.isEmpty);
+              // if (t != null && t.isNotEmpty) {
+              //   print(t);
+              // }
               // handleSignUp();
+              editKonten();
+              // print(widget.user.token);
             },
             style: TextButton.styleFrom(
               backgroundColor: primaryColor,
@@ -418,7 +519,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
             jenisKonten == 'video' ? link() : SizedBox(),
             deskripsi(),
             activeStatus(),
-            addButton(),
+            isLoading ? LoadingButton() : addButton(),
             SizedBox(
               height: defaultMargin,
             ),

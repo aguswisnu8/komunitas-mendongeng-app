@@ -17,21 +17,21 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
-    UserModel user;
+    // UserModel user;
 
-    String level = 'anggota';
-    String? name;
-    String? email;
-    String? image;
+    // String level = 'anggota';
+    // String? name;
+    // String? email;
+    // String? image;
     bool flag = authProvider.logged;
 
-    if (flag) {
-      user = authProvider.user;
-      level = user.level.toString();
-      name = user.name;
-      email = user.email;
-      image = user.profilePhotoPath;
-    }
+    // if (flag) {
+    //   user = authProvider.user;
+    //   level = user.level.toString();
+    //   name = user.name;
+    //   email = user.email;
+    //   image = user.profilePhotoPath;
+    // }
 
     Widget header() {
       return AppBar(
@@ -43,10 +43,10 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.all(16),
             child: Row(
               children: [
-                cekImage(image.toString())
+                cekImage(authProvider.currentUser.profilePhotoPath.toString())
                     ? ClipOval(
                         child: Image.network(
-                          image.toString(),
+                          authProvider.currentUser.profilePhotoPath.toString(),
                           width: 80,
                           fit: BoxFit.cover,
                           height: 80,
@@ -69,25 +69,24 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Text(
                         // 'Hallo, Agus Wisnu Kusuma Nata',
-                        'Hallo, ${name}',
+                        'Hallo, ${authProvider.currentUser.name}',
                         style: whiteTextStyle.copyWith(
                             fontSize: 18, fontWeight: semiBold),
                       ),
                       Text(
                         // 'aguswisnu8@gmail.com',
-                        '${email}',
+                        '${authProvider.currentUser.email}',
                         style: whiteTextStyle.copyWith(),
                       ),
                     ],
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      // flag = false;
-
-                      authProvider.logStatus(false);
-                    });
+                  onTap: () async {
+                    if (await authProvider
+                        .logout(authProvider.user.token.toString())) {
+                      setState(() {});
+                    }
                   },
                   child: Icon(
                     Icons.exit_to_app,
@@ -151,13 +150,23 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/p-edit');
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => EditProfilePage(user),
-                  //   ),
-                  // );
+                  // Navigator.pushNamed(context, '/p-edit').then((value) async {
+                  //   await authProvider
+                  //       .getCurrentUser(authProvider.user.token.toString());
+                  //   setState(() {});
+                  // });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditProfilePage(
+                        authProvider.currentUser,
+                      ),
+                    ),
+                  ).then((value) async {
+                    await authProvider
+                        .getCurrentUser(authProvider.user.token.toString());
+                    setState(() {});
+                  });
                 },
                 child: menuItem('Edit Profile'),
               ),
@@ -182,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(
                 height: 16,
               ),
-              level == 'admin'
+              authProvider.user.level == 'admin'
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -266,7 +275,7 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 44,
             child: TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/daftar').then((value) {
+                Navigator.pushNamed(context, '/daftar').then((value) async {
                   setState(() {});
                 });
               },
@@ -294,7 +303,7 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 44,
             child: TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/login').then((value) {
+                Navigator.pushNamed(context, '/login').then((value) async {
                   setState(() {});
                 });
               },

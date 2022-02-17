@@ -71,4 +71,69 @@ class KontenService {
       return false;
     }
   }
+
+  Future<bool> editKonten({
+    int? id,
+    String? judul,
+    String? filePath,
+    String? link,
+    String? deskripsi,
+    String? jenis,
+    int? status,
+    String? token,
+  }) async {
+    var url = '$baseUrl/kontens/$id';
+    var headers = {
+      // 'Content-Type': 'application/json',
+      'Authorization': token.toString(),
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    request.fields['judul'] = judul.toString();
+
+    if (filePath != null && filePath.isNotEmpty) {
+      request.files.add(
+          await http.MultipartFile.fromPath('gambar', filePath.toString()));
+    }
+    request.fields['link'] = link.toString();
+
+    request.fields['deskripsi'] = deskripsi.toString();
+
+    request.fields['jenis'] = jenis.toString();
+
+    request.fields['status'] = status.toString();
+
+    request.headers.addAll(headers);
+
+    var response = await request.send();
+    var responseString = await response.stream.bytesToString();
+    print(responseString);
+    print("Servis Upload Konten ${response.statusCode}");
+
+    if (response.statusCode == 200) {
+      print("Servis Upload Berhasil");
+      return true;
+    } else {
+      print("Servis Upload Gagal");
+      return false;
+    }
+  }
+
+  Future<bool> deleteKonten(int id, String token) async {
+    var url = '$baseUrl/kontens/$id';
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    };
+    var response = await http.delete(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    print(response.body);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Gagal Menghapus Konten');
+    }
+  }
 }

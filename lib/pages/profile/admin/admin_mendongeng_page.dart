@@ -22,6 +22,11 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
 
   bool _isAscending = false;
 
+  getInit() async {
+    await Provider.of<MendongengProvider>(context, listen: false)
+        .getMendongengs();
+  }
+
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
@@ -29,6 +34,70 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
 
     MendongengProvider mendongengProvider =
         Provider.of<MendongengProvider>(context);
+
+    Future<void> loadingDialog() {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => Container(
+          // width: MediaQuery.of(context).size.width - (4 * defaultMargin),
+          width: 200,
+          child: AlertDialog(
+            backgroundColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: defaultMargin),
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    deleteMendongeng(int id) async {
+      loadingDialog();
+      if (await mendongengProvider.deleteMendongeng(
+        id,
+        authProvider.user.token.toString(),
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.green[400],
+            content: Text(
+              'Kegiatan Mendongeng id: $id berhasil dihapus',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Menghapus Kegiatan Mendongeng id: $id',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      Navigator.pop(context);
+    }
 
     Future<void> showDeleteDialog(int id, String name) {
       return showDialog(
@@ -57,11 +126,14 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Konten $id',
+                    'Hapus Kegiatan id $id',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,
                     ),
+                  ),
+                  Divider(
+                    thickness: 1,
                   ),
                   Text(
                     name,
@@ -78,17 +150,7 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
                       onPressed: () {
                         Navigator.pop(context);
                         // print('peserta');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            duration: Duration(seconds: 1),
-                            backgroundColor: Colors.green[400],
-                            content: Text(
-                              'Kegiatan id: $id berhasil dihapus',
-                              style: whiteTextStyle,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
+                        deleteMendongeng(id);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.redAccent,
@@ -160,7 +222,22 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
                 });
               },
             ),
-            DataColumn(label: Text('waktu')),
+            DataColumn(
+              label: Text('waktu'),
+              onSort: (columnIndex, ascending) {
+                setState(() {
+                  _currentSortColumn = columnIndex;
+                  _isAscending = ascending;
+                  if (ascending) {
+                    mendongengProvider.mendongengs.sort(
+                        (a, b) => b.tgl.toString().compareTo(a.tgl.toString()));
+                  } else {
+                    mendongengProvider.mendongengs.sort(
+                        (a, b) => a.tgl.toString().compareTo(b.tgl.toString()));
+                  }
+                });
+              },
+            ),
             DataColumn(label: Text('kegiatan')),
             DataColumn(label: Text('partner')),
             DataColumn(label: Text('jenis')),
@@ -201,7 +278,10 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
                             builder: (context) =>
                                 EditMendongengPage(mendongeng, user),
                           ),
-                        );
+                        ).then((value) async {
+                          await getInit();
+                          setState(() {});
+                        });
                       },
                       child: Container(
                         color: Colors.blueAccent,
@@ -216,8 +296,12 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        showDeleteDialog(
-                            mendongeng.id!, mendongeng.name.toString());
+                        showDeleteDialog(mendongeng.id!,
+                                '${mendongeng.name} - ${mendongeng.tgl}')
+                            .then((value) async {
+                          await getInit();
+                          setState(() {});
+                        });
                       },
                       child: Container(
                         color: Colors.redAccent,
@@ -316,7 +400,14 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: content(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await getInit();
+
+          setState(() {});
+        },
+        child: content(),
+      ),
     );
   }
 }

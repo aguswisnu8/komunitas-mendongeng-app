@@ -37,6 +37,16 @@ class MendongengTile extends StatelessWidget {
                       width: 320,
                       height: 180,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 320,
+                          height: 180,
+                          color: Color(0xffD1D1D1),
+                          child: Center(
+                            child: Text('Can\'t Load Image'),
+                          ),
+                        );
+                      },
                     ),
                   )
                 : ClipRRect(
@@ -45,7 +55,7 @@ class MendongengTile extends StatelessWidget {
                       topRight: Radius.circular(20),
                     ),
                     child: Image.asset(
-                      'assets/image_test.jpg',
+                      'assets/bali_mendongeng.png',
                       width: 320,
                       height: 180,
                       fit: BoxFit.cover,

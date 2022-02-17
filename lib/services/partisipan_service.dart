@@ -32,7 +32,8 @@ class PartisipanService {
   }
 
   Future<List> addPartisipan(
-      int mendongengId, String peran, String token) async {
+      int mendongengId, String peran, int stReq, String token) async {
+    print('st : $stReq');
     var url = '$baseUrl/partisipans';
     var headers = {
       'Content-Type': 'application/json',
@@ -41,6 +42,7 @@ class PartisipanService {
     var body = jsonEncode({
       'mendongeng_id': mendongengId,
       'peran': peran,
+      'st_req': stReq,
     });
 
     var response = await http.post(
@@ -59,6 +61,50 @@ class PartisipanService {
       // throw Exception('Gagal Mendata Partisipan');
       returnResponse.add(false);
       return returnResponse;
+    }
+  }
+
+  Future<bool> editPartisipan(int id, String peran, String token) async {
+    var url = '$baseUrl/partisipans/$id';
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    };
+    var body = jsonEncode({
+      'peran': peran,
+    });
+    var response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+    // bool test = true;
+
+    // if (test) {
+    print(response.body);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Gagal Memperbaharui Peran');
+    }
+  }
+
+  Future<bool> deletePartisipan(int id, String token) async {
+    var url = '$baseUrl/partisipans/$id';
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    };
+    var response = await http.delete(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    print(response.body);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Gagal Menghapus Partisipan');
     }
   }
 }

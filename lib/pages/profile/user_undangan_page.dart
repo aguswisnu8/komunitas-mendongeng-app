@@ -52,6 +52,70 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
 
     print('panjangn Undangan ${filterUndangan.length}');
 
+    Future<void> loadingDialog() {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => Container(
+          // width: MediaQuery.of(context).size.width - (4 * defaultMargin),
+          width: 200,
+          child: AlertDialog(
+            backgroundColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: defaultMargin),
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    deleteUndangan(int id) async {
+      loadingDialog();
+      if (await undanganProvider.deleteUndangan(
+        id,
+        authProvider.user.token.toString(),
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.green[400],
+            content: Text(
+              'Undangan id: $id berhasil dihapus',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Menghapus Undangan id: $id',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      Navigator.pop(context);
+    }
+
     Future<void> showDeleteDialog(int id, String name) {
       return showDialog(
         context: context,
@@ -79,11 +143,14 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Undangan $id',
+                    'Hapus Undangan id $id',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,
                     ),
+                  ),
+                  Divider(
+                    thickness: 1,
                   ),
                   Text(
                     name,
@@ -100,17 +167,7 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
                       onPressed: () {
                         Navigator.pop(context);
                         // print('peserta');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            duration: Duration(seconds: 1),
-                            backgroundColor: Colors.green[400],
-                            content: Text(
-                              'Undangan id: $id berhasil dihapus',
-                              style: whiteTextStyle,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
+                        deleteUndangan(id);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.redAccent,
@@ -221,8 +278,12 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        showDeleteDialog(undangan.id!.toInt(),
-                            undangan.nmKegiatan.toString());
+                        showDeleteDialog(undangan.id!,
+                                '${undangan.nmKegiatan} dari ${undangan.penyelenggara}')
+                            .then((value) async {
+                          await getInit();
+                          setState(() {});
+                        });
                       },
                       child: Container(
                         color: Colors.redAccent,
@@ -301,7 +362,13 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: content(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await getInit();
+          setState(() {});
+        },
+        child: content(),
+      ),
     );
   }
 }

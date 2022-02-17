@@ -9,23 +9,15 @@ import 'package:kom_mendongeng/theme.dart';
 import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
+  late final UserModel currentUser;
+
+  EditProfilePage(this.currentUser);
+
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  // image picker
-  var _image;
-  var imagePicker;
-  // late XFile a;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    imagePicker = new ImagePicker();
-  }
-
   TextEditingController nameController =
       TextEditingController(text: 'Agus Wisnu Kusuma Nata');
   TextEditingController emailController =
@@ -37,17 +29,142 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController deskripsiController =
       TextEditingController(text: 'Aku sangat Ganteng');
   TextEditingController expController = TextEditingController(text: '1');
+  // image picker
+  var _image;
+  var imagePicker;
+  // late XFile a;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    imagePicker = new ImagePicker();
+
+    nameController.text = widget.currentUser.name.toString();
+    emailController.text = widget.currentUser.email.toString();
+    alamatController.text = widget.currentUser.alamat.toString();
+    kontakController.text = widget.currentUser.medsos.toString();
+    deskripsiController.text = widget.currentUser.deskripsi.toString();
+    expController.text = widget.currentUser.exp.toString();
+  }
+
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
-    UserModel user = authProvider.user;
-    nameController.text = user.name.toString();
-    emailController.text = user.email.toString();
-    alamatController.text = user.alamat.toString();
-    kontakController.text = user.medsos.toString();
-    deskripsiController.text = user.deskripsi.toString();
-    expController.text = user.exp.toString();
+    // UserModel currentUser = authProvider.currentUser;
+
+    Future<void> loadingDialog() {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => Container(
+          // width: MediaQuery.of(context).size.width - (4 * defaultMargin),
+          width: 200,
+          child: AlertDialog(
+            backgroundColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: defaultMargin),
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    updateProfile() async {
+      loadingDialog();
+      if (_image != null) {
+        if (await authProvider.updateUserProfile(
+          filePath: _image.path,
+          name: nameController.text,
+          email: emailController.text,
+          alamat: alamatController.text,
+          medsos: kontakController.text,
+          deskripsi: deskripsiController.text,
+          exp: int.parse(expController.text),
+          token: authProvider.user.token,
+        )) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: primaryColor,
+              content: Text(
+                'Berhasil Memperbaharui Profile',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.pop(context);
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.redAccent,
+              content: Text(
+                'Gagal Memperbaharui Profile',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } else {
+        if (await authProvider.updateUserProfile(
+          name: nameController.text,
+          email: emailController.text,
+          alamat: alamatController.text,
+          medsos: kontakController.text,
+          deskripsi: deskripsiController.text,
+          exp: int.parse(expController.text),
+          token: authProvider.user.token,
+        )) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: primaryColor,
+              content: Text(
+                'Berhasil Memperbaharui Profile',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.pop(context);
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.redAccent,
+              content: Text(
+                'Gagal Memperbaharui Profile',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.pop(context);
+        }
+      }
+    }
 
     Widget nameInput() {
       return Container(
@@ -345,10 +462,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             decoration: BoxDecoration(color: backgroundColor),
                             width: 100,
                             height: 100,
-                            child: cekImage(user.profilePhotoPath.toString())
+                            child: cekImage(widget.currentUser.profilePhotoPath
+                                    .toString())
                                 ? Image(
-                                    image: NetworkImage(
-                                        user.profilePhotoPath.toString()),
+                                    image: NetworkImage(widget
+                                        .currentUser.profilePhotoPath
+                                        .toString()),
                                   )
                                 : Image(
                                     image:
@@ -429,6 +548,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
           IconButton(
             onPressed: () {
               // print(nameController.text);
+              // print(emailController.text);
+              // print(alamatController.text);
+              // print(kontakController.text);
+              // print(deskripsiController.text);
+              // print(expController.text);
+              updateProfile();
             },
             icon: Icon(
               Icons.check,

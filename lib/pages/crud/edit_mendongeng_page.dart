@@ -4,10 +4,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/models/mendongeng_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/auth_provider.dart';
+import 'package:kom_mendongeng/providers/mendongeng_provider.dart';
 import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class EditMendongengPage extends StatefulWidget {
   // late final Map products;
@@ -62,10 +66,114 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
   String? jenisKegiatan = '';
   String? pathGambarKegiatan = '';
   int? statusKegiatan = 1;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-  
+    MendongengProvider mendongengProvider =
+        Provider.of<MendongengProvider>(context);
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+
+    editMendongeng() async {
+      setState(() {
+        isLoading = true;
+      });
+      // print(nameController.text);
+      // print(partnerController.text);
+      // print(lokasiController.text);
+      // print(_image == null);
+      // print(tglController.text);
+      // print(deskripsiController.text);
+      // print(jenisKegiatan);
+      // print(gmapController.text);
+      // print(expReqController.text);
+      // print(stReqController.text);
+      if (_image != null) {
+        if (await mendongengProvider.editMendongeng(
+          id: widget.mendongeng.id,
+          name: nameController.text,
+          partner: partnerController.text,
+          lokasi: lokasiController.text,
+          filePath: _image.path,
+          tgl: tglController.text,
+          deskripsi: deskripsiController.text,
+          jenis: jenisKegiatan,
+          gmapLink: gmapController.text,
+          expReq: int.parse(expReqController.text),
+          stReq: int.parse(stReqController.text),
+          status: statusKegiatan,
+          token: authProvider.user.token,
+        )) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: primaryColor,
+              content: Text(
+                'Berhasil Memperbaharui Kegiatan',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.redAccent,
+              content: Text(
+                'Gagal Memperbaharui Kegiatan',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+      } else {
+        if (await mendongengProvider.editMendongeng(
+          id: widget.mendongeng.id,
+          name: nameController.text,
+          partner: partnerController.text,
+          lokasi: lokasiController.text,
+          tgl: tglController.text,
+          deskripsi: deskripsiController.text,
+          jenis: jenisKegiatan,
+          gmapLink: gmapController.text,
+          expReq: int.parse(expReqController.text),
+          stReq: int.parse(stReqController.text),
+          status: statusKegiatan,
+          token: authProvider.user.token,
+        )) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: primaryColor,
+              content: Text(
+                'Berhasil Memperbaharui Kegiatan',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.redAccent,
+              content: Text(
+                'Gagal Memperbaharui Kegiatan',
+                style: whiteTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
 
     Widget namaKegiatan() {
       return Container(
@@ -595,11 +703,7 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
         child: TextButton(
           onPressed: () {
             // Navigator.pop(context);
-            print(tglController.text);
-            print(nameController.text);
-            print(deskripsiController.text);
-            print(lokasiController.text);
-            print(jenisKegiatan);
+            editMendongeng();
           },
           style: TextButton.styleFrom(
             backgroundColor: primaryColor,
@@ -683,7 +787,7 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
             expReq(),
             stReq(),
             activeStatus(),
-            addButton(),
+            isLoading ? LoadingButton() : addButton(),
             SizedBox(
               height: defaultMargin,
             ),
@@ -695,7 +799,7 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Tambah Kegiatan Baru',
+          'Edit Kegiatan Baru',
           style: whiteTextStyle,
         ),
         backgroundColor: primaryColor,

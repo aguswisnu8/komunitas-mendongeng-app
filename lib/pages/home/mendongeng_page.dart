@@ -112,35 +112,43 @@ class _MendongengPageState extends State<MendongengPage> {
           header(),
         ];
       },
-      body: ListView(
-        children: [
-          akanDatang(),
-          Column(
-            children: mendongengProvider.mendongengs
-                .map(
-                  (mendongeng) => commingDay(mendongeng.tgl.toString())
-                      ? MendongengCard(mendongeng)
-                      : SizedBox(),
-                )
-                .toList(),
-          ),
-          // MendongengCard(),
-          // MendongengCard(),
-          sudahDilakukan(),
-          Column(
-            children: mendongengProvider.mendongengs
-                .map(
-                  (mendongeng) => pastDay(mendongeng.tgl.toString())
-                      ? MendongengCard(mendongeng)
-                      : SizedBox(),
-                )
-                .toList(),
-          ),
-          // MendongengCard(),
-          // MendongengCard(),
-          // MendongengCard(),
-          // MendongengCard(),
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Provider.of<MendongengProvider>(context, listen: false)
+              .getMendongengs();
+
+          setState(() {});
+        },
+        child: ListView(
+          children: [
+            akanDatang(),
+            Column(
+              children: mendongengProvider.mendongengs
+                  .map(
+                    (mendongeng) => commingDay(mendongeng.tgl.toString())
+                        ? MendongengCard(mendongeng)
+                        : SizedBox(),
+                  )
+                  .toList(),
+            ),
+            // MendongengCard(),
+            // MendongengCard(),
+            sudahDilakukan(),
+            Column(
+              children: mendongengProvider.mendongengs
+                  .map(
+                    (mendongeng) => pastDay(mendongeng.tgl.toString())
+                        ? MendongengCard(mendongeng)
+                        : SizedBox(),
+                  )
+                  .toList(),
+            ),
+            // MendongengCard(),
+            // MendongengCard(),
+            // MendongengCard(),
+            // MendongengCard(),
+          ],
+        ),
       ),
     );
   }

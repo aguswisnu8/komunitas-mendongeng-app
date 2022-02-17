@@ -114,4 +114,75 @@ class MendongengService {
       return false;
     }
   }
+
+  Future<bool> editMendongeng({
+    int? id,
+    String? name,
+    String? lokasi,
+    String? tgl,
+    String? deskripsi,
+    String? filePath,
+    String? partner,
+    String? jenis,
+    int? status,
+    String? gmapLink,
+    int? expReq,
+    int? stReq,
+    String? token,
+  }) async {
+    var url = '$baseUrl/mendongengs/$id';
+    var headers = {
+      // 'Content-Type': 'application/json',
+      'Authorization': token.toString(),
+    };
+
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    if (filePath != null && filePath.isNotEmpty) {
+      request.files.add(
+          await http.MultipartFile.fromPath('gambar', filePath.toString()));
+    }
+    request.fields['name'] = name.toString();
+    request.fields['lokasi'] = lokasi.toString();
+    request.fields['tgl'] = tgl.toString();
+    request.fields['deskripsi'] = deskripsi.toString();
+    request.fields['partner'] = partner.toString();
+    request.fields['jenis'] = jenis.toString();
+    request.fields['status'] = status.toString();
+    request.fields['gmap_link'] = gmapLink.toString();
+    request.fields['exp_req'] = expReq.toString();
+    request.fields['st_req'] = stReq.toString();
+    request.headers.addAll(headers);
+
+    var response = await request.send();
+    var responseString = await response.stream.bytesToString();
+    print(responseString);
+    print("Servis Upload Mendongeng ${response.statusCode}");
+
+    if (response.statusCode == 200) {
+      print("Servis Upload Berhasil");
+      return true;
+    } else {
+      print("Servis Upload Gagal");
+      return false;
+    }
+  }
+
+  Future<bool> deleteMendongeng(int id, String token) async {
+    var url = '$baseUrl/mendongengs/$id';
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    };
+    var response = await http.delete(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    print(response.body);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Gagal Menghapus Kegiatan');
+    }
+  }
 }

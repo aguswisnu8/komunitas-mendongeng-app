@@ -45,6 +45,16 @@ class KontenTile extends StatelessWidget {
                           width: 150,
                           height: 150,
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 180,
+                              height: 180,
+                              color: Color(0xffD1D1D1),
+                              child: Center(
+                                child: Text('Can\'t Load Image'),
+                              ),
+                            );
+                          },
                         ),
                       )
                     : ClipRRect(

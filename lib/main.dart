@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
           // '/d-anggota': (context) => DetailAnggotaPage(),
 
           // profile
-          '/p-edit': (context) => EditProfilePage(),
+          // '/p-edit': (context) => EditProfilePage(),
           '/p-resetpass': (context) => ResetPasswordPage(),
           '/p-userkonten': (context) => UserKontenPage(),
           '/p-userundangan': (context) => UserUndanganPage(),

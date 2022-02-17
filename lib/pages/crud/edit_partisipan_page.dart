@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/models/partisipan_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
+import 'package:kom_mendongeng/pages/widget/loding_button.dart';
+import 'package:kom_mendongeng/providers/partisipan_provider.dart';
 import 'package:kom_mendongeng/public_function.dart';
 import 'package:kom_mendongeng/theme.dart';
+import 'package:provider/provider.dart';
 
 class EditPartisipanPage extends StatefulWidget {
   // late final Map products;
@@ -15,10 +18,62 @@ class EditPartisipanPage extends StatefulWidget {
 }
 
 class _EditPartisipanPageState extends State<EditPartisipanPage> {
-  // int? _groupValue = 1;
   String? peran = 'peserta';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    peran = widget.partispan.peran;
+  }
+
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
+    PartisipanProvider partisipanProvider =
+        Provider.of<PartisipanProvider>(context);
+
+    editPartisipan() async {
+      setState(() {
+        isLoading = true;
+      });
+      print(
+          '${widget.partispan.id!} - $peran - ${widget.user.token}');
+      if (await partisipanProvider.editPartisipan(
+        widget.partispan.id!,
+        peran.toString(),
+        widget.user.token.toString(),
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: primaryColor,
+            content: Text(
+              'Berhasil Mengubah Peran',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Gagal Mengubah Peran',
+              style: whiteTextStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     Widget headerText() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -147,7 +202,10 @@ class _EditPartisipanPageState extends State<EditPartisipanPage> {
         child: TextButton(
             onPressed: () {
               // Navigator.pushNamed(context, '/home');
-              Navigator.pop(context);
+              // Navigator.pop(context);
+              if (peran != widget.partispan.peran) {
+                editPartisipan();
+              }
             },
             style: TextButton.styleFrom(
               backgroundColor: primaryColor,
@@ -171,7 +229,7 @@ class _EditPartisipanPageState extends State<EditPartisipanPage> {
           children: [
             headerText(),
             peranUser(),
-            editButton(),
+            isLoading ? LoadingButton() : editButton(),
             SizedBox(
               height: defaultMargin,
             ),
