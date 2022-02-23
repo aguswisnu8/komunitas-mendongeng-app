@@ -43,6 +43,32 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
         statusUndangan.toString(),
         widget.user.token.toString(),
       )) {
+        // if (statusUndangan == 'terima') {
+        //   print('masuk terima' + widget.undangan.nmKegiatan.toString());
+        //   // Navigator.pop(context);
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) =>
+        //           AddMendongengFromUndanganPage(widget.undangan),
+        //     ),
+        //   );
+        // }
+        if (statusUndangan == 'terima') {
+          print('masuk terima' + widget.undangan.nmKegiatan.toString());
+          Navigator.pop(context);
+          // Navigator.pushNamed(context, '/add-konten');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AddMendongengFromUndanganPage(widget.undangan),
+            ),
+          );
+        } else {
+          Navigator.pop(context);
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             duration: Duration(seconds: 1),
@@ -54,17 +80,6 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
             ),
           ),
         );
-        if (statusUndangan == 'terima') {
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  AddMendongengFromUndanganPage(widget.undangan),
-            ),
-          );
-        }
-        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -278,15 +293,10 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
                 print('masuk edit');
                 editUndangan();
                 // if (statusUndangan == 'terima') {
-                //   Navigator.pop(context);
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) =>
-                //           AddMendongengFromUndanganPage(widget.undangan),
-                //     ),
-                //   );
+                //   print('masuk terima' + widget.undangan.nmKegiatan.toString());
+                //   Navigator.pushNamed(context, '/add-konten');
                 // }
+
                 // Navigator.pop(context);
               } else {
                 Navigator.pop(context);
@@ -320,6 +330,7 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
                 : isLoading
                     ? LoadingButton()
                     : editButton(),
+            // isLoading ? LoadingButton() : editButton(),
             SizedBox(
               height: defaultMargin,
             ),

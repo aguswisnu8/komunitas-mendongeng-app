@@ -96,7 +96,9 @@ class MendongengService {
     request.fields['jenis'] = jenis.toString();
     request.fields['status'] = status.toString();
     request.fields['gmap_link'] = gmapLink.toString();
-    request.fields['udangan_id'] = udanganId.toString();
+    if (udanganId != null) {
+      request.fields['udangan_id'] = udanganId.toString();
+    }
     request.fields['exp_req'] = expReq.toString();
     request.fields['st_req'] = stReq.toString();
     request.headers.addAll(headers);

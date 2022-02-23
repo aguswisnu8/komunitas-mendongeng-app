@@ -103,7 +103,7 @@ class _DetailAnggotaPageState extends State<DetailAnggotaPage> {
               height: 2,
             ),
             Text(
-              'Pengalaman sbg Pendendongeng : ${cekPengalaman(widget.anggota.exp.toString())}',
+              'Pengalaman Mendongeng : ${cekPengalaman(widget.anggota.exp.toString())}',
               // 'Pengalaman sbg Pendendongeng : pemula',
               style: greyTextStyle,
             ),

@@ -682,7 +682,7 @@ class _AddMendongengFromUndanganPageState
             if (_formKey.currentState!.validate() &&
                 _image != null &&
                 jenisKegiatan!.isNotEmpty &&
-                tglController.text == 'pilih tanggal') {
+                tglController.text != 'pilih tanggal') {
               addMendongeng();
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
