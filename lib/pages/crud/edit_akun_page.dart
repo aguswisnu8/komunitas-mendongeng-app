@@ -49,7 +49,7 @@ class _EditAkunPageState extends State<EditAkunPage> {
             duration: Duration(seconds: 1),
             backgroundColor: primaryColor,
             content: Text(
-              'Berhasil Memperbaharui User',
+              'Berhasil Memperbaharui Akun',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -62,7 +62,7 @@ class _EditAkunPageState extends State<EditAkunPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Memperbaharui User',
+              'Gagal Memperbaharui Akun',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -255,7 +255,7 @@ class _EditAkunPageState extends State<EditAkunPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit Peran',
+          'Edit Akun',
           style: whiteTextStyle,
         ),
         backgroundColor: primaryColor,

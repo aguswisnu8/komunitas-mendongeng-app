@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/mendongeng_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/pages/crud/edit_mendongeng_page.dart';
 import 'package:kom_mendongeng/providers/auth_provider.dart';
@@ -14,13 +15,16 @@ class AdminMendongengPage extends StatefulWidget {
 }
 
 class _AdminMendongengPageState extends State<AdminMendongengPage> {
-  final List<Map> _products = List.generate(10, (i) {
-    return {"id": i, "name": "Product $i", "price": Random().nextInt(200) + 1};
-  });
-
   int _currentSortColumn = 0;
 
   bool _isAscending = false;
+
+  List<MendongengModel> filteredMendongeng = [];
+  String filter = '';
+  bool filterStatus = false;
+  bool filterInputStatus = false;
+  String activeFilterButton = '';
+  TextEditingController filterController = TextEditingController(text: '');
 
   getInit() async {
     await Provider.of<MendongengProvider>(context, listen: false)
@@ -34,6 +38,206 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
 
     MendongengProvider mendongengProvider =
         Provider.of<MendongengProvider>(context);
+
+    filterKegiatan(String query) {
+      switch (filter) {
+        case 'name':
+          final result = mendongengProvider.mendongengs.where((x) {
+            String name = '${x.name!.toLowerCase()}';
+            return name.contains(query.toLowerCase());
+          }).toList();
+          setState(() {
+            filteredMendongeng = result;
+          });
+          return;
+        case 'jenis':
+          final result = mendongengProvider.mendongengs
+              .where((x) => x.jenis == query)
+              .toList();
+          setState(() {
+            filteredMendongeng = result;
+          });
+          return;
+        default:
+      }
+    }
+
+    Widget filterClearButton() {
+      return TextButton(
+        onPressed: () {
+          setState(() {
+            filter = '';
+            filterStatus = false;
+            filterInputStatus = false;
+            filteredMendongeng = mendongengProvider.mendongengs;
+            activeFilterButton = '';
+          });
+        },
+        child: Text(
+          'Clear Filter',
+          style: whiteTextStyle,
+        ),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 4,
+          ),
+          backgroundColor: Colors.red[400],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+    }
+
+    Widget filterInput() {
+      return Column(
+        children: [
+          
+          Divider(
+            thickness: 1,
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: defaultMargin),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 40,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: filterController,
+                            style: blackTextStyle,
+                            decoration: InputDecoration.collapsed(
+                                hintText: 'Cari Nama Kegiatan',
+                                hintStyle: greyTextStyle),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          child: Icon(Icons.search),
+                          onTap: () {
+                            setState(() {
+                              filterInputStatus = true;
+                              filter = 'name';
+                            });
+                            filterKegiatan(filterController.text);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Filter Jenis :',
+                style: blackTextStyle.copyWith(fontWeight: semiBold),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    filter = 'jenis';
+                    activeFilterButton = 'sekolah';
+                  });
+                  filterKegiatan('sekolah');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: activeFilterButton == 'sekolah'
+                      ? primaryColor
+                      : greyTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'sekolah',
+                  style: whiteTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    filter = 'jenis';
+                    activeFilterButton = 'baksos';
+                  });
+                  filterKegiatan('baksos');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: activeFilterButton == 'baksos'
+                      ? primaryColor
+                      : greyTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'baksos',
+                  style: whiteTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    filter = 'jenis';
+                    activeFilterButton = 'korporat';
+                  });
+                  filterKegiatan('korporat');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: activeFilterButton == 'korporat'
+                      ? primaryColor
+                      : greyTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'korporat',
+                  style: whiteTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          filter == '' ? SizedBox() : filterClearButton(),
+          Divider(
+            thickness: 1,
+          ),
+        ],
+      );
+    }
 
     Future<void> loadingDialog() {
       return showDialog(
@@ -197,171 +401,111 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
       );
     }
 
-    Widget tableKonten() {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          columnSpacing: 30,
-          sortColumnIndex: _currentSortColumn,
-          sortAscending: _isAscending,
-          // border: ,
-          columns: [
-            DataColumn(
-              label: Text('id'),
-              onSort: (columnIndex, ascending) {
-                setState(() {
-                  _currentSortColumn = columnIndex;
-                  _isAscending = ascending;
-                  if (ascending) {
-                    mendongengProvider.mendongengs
-                        .sort((a, b) => b.id!.toInt().compareTo(a.id!.toInt()));
-                  } else {
-                    mendongengProvider.mendongengs
-                        .sort((a, b) => a.id!.toInt().compareTo(b.id!.toInt()));
-                  }
-                });
-              },
-            ),
-            DataColumn(
-              label: Text('waktu'),
-              onSort: (columnIndex, ascending) {
-                setState(() {
-                  _currentSortColumn = columnIndex;
-                  _isAscending = ascending;
-                  if (ascending) {
-                    mendongengProvider.mendongengs.sort(
-                        (a, b) => b.tgl.toString().compareTo(a.tgl.toString()));
-                  } else {
-                    mendongengProvider.mendongengs.sort(
-                        (a, b) => a.tgl.toString().compareTo(b.tgl.toString()));
-                  }
-                });
-              },
-            ),
-            DataColumn(label: Text('kegiatan')),
-            DataColumn(label: Text('partner')),
-            DataColumn(label: Text('jenis')),
-            DataColumn(label: Text('edit')),
-            // DataColumn(label: Text('id')),
-            // DataColumn(label: Text('name')),
-            // DataColumn(
-            //   label: Text('price'),
-            //   onSort: (columnIndex, ascending) {
-            //     setState(() {
-            //       _currentSortColumn = columnIndex;
-            //       _isAscending = ascending;
-            //       if (ascending) {
-            //         _products.sort((a, b) => b['price'].compareTo(a['price']));
-            //       } else {
-            //         _products.sort((a, b) => a['price'].compareTo(b['price']));
-            //       }
-            //     });
-            //   },
-            // ),
-            // DataColumn(label: Text('edit')),
-          ],
-          rows: mendongengProvider.mendongengs.map((mendongeng) {
-            return DataRow(cells: [
-              DataCell(Text('${mendongeng.id}')),
-              DataCell(Text('${mendongeng.tgl}')),
-              DataCell(Text('${mendongeng.name}')),
-              DataCell(Text('${mendongeng.partner}')),
-              DataCell(Text('${mendongeng.jenis}')),
-              DataCell(
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EditMendongengPage(mendongeng, user),
-                          ),
-                        ).then((value) async {
-                          await getInit();
-                          setState(() {});
-                        });
-                      },
-                      child: Container(
-                        color: Colors.blueAccent,
-                        child: Icon(
-                          Icons.edit,
-                          color: whiteTextColor,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        showDeleteDialog(mendongeng.id!,
-                                '${mendongeng.name} - ${mendongeng.tgl}')
-                            .then((value) async {
-                          await getInit();
-                          setState(() {});
-                        });
-                      },
-                      child: Container(
-                        color: Colors.redAccent,
-                        child: Icon(
-                          Icons.delete,
-                          color: whiteTextColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ]);
-          }).toList(),
-          // rows: _products.map((item) {
-          //   return DataRow(cells: [
-          //     DataCell(Text(item['id'].toString())),
-          //     DataCell(Text(item['name'])),
-          //     DataCell(Text(item['price'].toString())),
-          //     DataCell(
-          //       Row(
-          //         children: [
-          //           GestureDetector(
-          //             onTap: () {
-          //               Navigator.push(
-          //                 context,
-          //                 MaterialPageRoute(
-          //                   builder: (context) => EditMendongengPage(item),
-          //                 ),
-          //               );
-          //             },
-          //             child: Container(
-          //               color: Colors.blueAccent,
-          //               child: Icon(
-          //                 Icons.edit,
-          //                 color: whiteTextColor,
-          //               ),
-          //             ),
-          //           ),
-          //           SizedBox(
-          //             width: 10,
-          //           ),
-          //           GestureDetector(
-          //             onTap: () {
-          //               showDeleteDialog(item['id'], item['name']);
-          //             },
-          //             child: Container(
-          //               color: Colors.redAccent,
-          //               child: Icon(
-          //                 Icons.delete,
-          //                 color: whiteTextColor,
-          //               ),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     )
-          //   ]);
-          // }).toList(),
+    Widget mendongengListTile(MendongengModel mendongeng) {
+      return Container(
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.only(
+          top: 16,
+          right: 16,
+          left: 16,
         ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(width: 1, color: Color(0xffD1D1D1)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${mendongeng.name}',
+                    style: blackTextStyle.copyWith(
+                        fontWeight: semiBold, fontSize: 16),
+                  ),
+                  Text(
+                    'Partner: ${mendongeng.partner}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                  Text(
+                    'Jenis Kegiatan: ${mendongeng.jenis}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                  Text(
+                    'Waktu: ${mendongeng.tgl}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                  Text(
+                    'Lokasi: ${mendongeng.lokasi}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 30,
+            ),
+            Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditMendongengPage(mendongeng, user),
+                      ),
+                    ).then((value) async {
+                      await getInit();
+                      setState(() {});
+                    });
+                  },
+                  child: Container(
+                    color: Colors.blueAccent,
+                    child: Icon(
+                      Icons.edit,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    showDeleteDialog(mendongeng.id!,
+                            '${mendongeng.name} - ${mendongeng.tgl}')
+                        .then((value) async {
+                      await getInit();
+                      setState(() {});
+                    });
+                  },
+                  child: Container(
+                    color: Colors.redAccent,
+                    child: Icon(
+                      Icons.delete,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget mendongengList() {
+      return Column(
+        children: filter == ''
+            ? mendongengProvider.mendongengs.map((item) {
+                return mendongengListTile(item);
+              }).toList()
+            : filteredMendongeng.map((item) {
+                return mendongengListTile(item);
+              }).toList(),
       );
     }
 
@@ -372,7 +516,9 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
         child: ListView(
           children: [
             createButton(),
-            tableKonten(),
+            // tableKonten(),
+            filterInput(),
+            mendongengList(),
             SizedBox(
               height: defaultMargin,
             ),

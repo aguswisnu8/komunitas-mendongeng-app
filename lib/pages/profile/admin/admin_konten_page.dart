@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/konten_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/pages/crud/edit_konten_page.dart';
 import 'package:kom_mendongeng/providers/auth_provider.dart';
@@ -14,9 +15,12 @@ class AdminKontenPage extends StatefulWidget {
 }
 
 class _AdminKontenPageState extends State<AdminKontenPage> {
-  final List<Map> _products = List.generate(10, (i) {
-    return {"id": i, "name": "Product $i", "price": Random().nextInt(200) + 1};
-  });
+  List<KontenModel> filteredKonten = [];
+  String filter = '';
+  bool filterStatus = false;
+  bool filterInputStatus = false;
+  String activeFilterButton = '';
+  TextEditingController filterController = TextEditingController(text: '');
 
   int _currentSortColumn = 0;
   bool _isAscending = false;
@@ -31,6 +35,186 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
     UserModel user = authProvider.user;
 
     KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+
+    filterKonten(String query) {
+      switch (filter) {
+        case 'judul':
+          final result = kontenProvider.kontens.where((x) {
+            String judul = x.judul!.toLowerCase();
+            return judul.contains(query.toLowerCase());
+          }).toList();
+          setState(() {
+            filteredKonten = result;
+          });
+          return;
+        case 'jenis':
+          final result =
+              kontenProvider.kontens.where((x) => x.jenis == query).toList();
+          setState(() {
+            filteredKonten = result;
+          });
+          return;
+        default:
+      }
+    }
+
+    Widget filterClearButton() {
+      return TextButton(
+        onPressed: () {
+          setState(() {
+            filter = '';
+            filterStatus = false;
+            filterInputStatus = false;
+            activeFilterButton = '';
+            filteredKonten = kontenProvider.kontens;
+          });
+        },
+        child: Text(
+          'Clear Filter',
+          style: whiteTextStyle,
+        ),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 4,
+          ),
+          backgroundColor: Colors.red[400],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+    }
+
+    Widget filterInput() {
+      return Column(
+        children: [
+          Text(
+            'List Konten',
+            style: blackTextStyle.copyWith(
+              fontWeight: semiBold,
+              fontSize: 18,
+            ),
+          ),
+          Divider(
+            thickness: 1,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: defaultMargin),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 40,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: filterController,
+                            style: blackTextStyle,
+                            decoration: InputDecoration.collapsed(
+                                hintText: 'Cari', hintStyle: greyTextStyle),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          child: Icon(Icons.search),
+                          onTap: () {
+                            setState(() {
+                              filterInputStatus = true;
+                              filter = 'judul';
+                            });
+                            filterKonten(filterController.text);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Filter Jenis :',
+                style: blackTextStyle.copyWith(fontWeight: semiBold),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    filter = 'jenis';
+                    activeFilterButton = 'artikel';
+                  });
+                  filterKonten('artikel');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: activeFilterButton == 'artikel'
+                      ? primaryColor
+                      : greyTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'artikel',
+                  style: whiteTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    filter = 'jenis';
+                    activeFilterButton = 'video';
+                  });
+                  filterKonten('video');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: activeFilterButton == 'video'
+                      ? primaryColor
+                      : greyTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'video',
+                  style: whiteTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          filter == '' ? SizedBox() : filterClearButton(),
+          Divider(
+            thickness: 1,
+          ),
+        ],
+      );
+    }
 
     Future<void> loadingDialog() {
       return showDialog(
@@ -172,153 +356,99 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
       );
     }
 
-    Widget tableKonten() {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          columnSpacing: 30,
-          sortColumnIndex: _currentSortColumn,
-          sortAscending: _isAscending,
-          // border: ,
-          columns: [
-            DataColumn(
-              label: Text('id'),
-              onSort: (columnIndex, ascending) {
-                setState(() {
-                  _currentSortColumn = columnIndex;
-                  _isAscending = ascending;
-                  if (ascending) {
-                    kontenProvider.kontens
-                        .sort((a, b) => b.id!.toInt().compareTo(a.id!.toInt()));
-                  } else {
-                    kontenProvider.kontens
-                        .sort((a, b) => a.id!.toInt().compareTo(b.id!.toInt()));
-                  }
-                });
-              },
-            ),
-            DataColumn(label: Text('judul')),
-            DataColumn(label: Text('jenis')),
-            DataColumn(label: Text('user')),
-            DataColumn(label: Text('edit')),
-            // DataColumn(label: Text('id')),
-            // DataColumn(label: Text('name')),
-            // DataColumn(
-            //   label: Text('price'),
-            //   onSort: (columnIndex, ascending) {
-            //     setState(() {
-            //       _currentSortColumn = columnIndex;
-            //       _isAscending = ascending;
-            //       if (ascending) {
-            //         _products.sort((a, b) => b['price'].compareTo(a['price']));
-            //       } else {
-            //         _products.sort((a, b) => a['price'].compareTo(b['price']));
-            //       }
-            //     });
-            //   },
-            // ),
-            // DataColumn(label: Text('edit')),
-          ],
-          rows: kontenProvider.kontens.map((konten) {
-            return DataRow(cells: [
-              DataCell(Text('${konten.id}')),
-              DataCell(Text('${konten.judul}')),
-              DataCell(Text('${konten.jenis}')),
-              DataCell(Text('${konten.user?.name}')),
-              DataCell(
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditKontenPage(konten, user),
-                          ),
-                        ).then((value) async {
-                          await getInit();
-                          setState(() {});
-                        });
-                      },
-                      child: Container(
-                        color: Colors.blueAccent,
-                        child: Icon(
-                          Icons.edit,
-                          color: whiteTextColor,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        showDeleteDialog(konten.id!,
-                                '${konten.jenis} dongeng - ${konten.judul}')
-                            .then((value) async {
-                          await getInit();
-                          setState(() {});
-                        });
-                      },
-                      child: Container(
-                        color: Colors.redAccent,
-                        child: Icon(
-                          Icons.delete,
-                          color: whiteTextColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ]);
-          }).toList(),
-          // rows: _products.map((item) {
-          //   return DataRow(cells: [
-          //     DataCell(Text(item['id'].toString())),
-          //     DataCell(Text(item['name'])),
-          //     DataCell(Text(item['price'].toString())),
-          //     DataCell(
-          //       Row(
-          //         children: [
-          //           GestureDetector(
-          //             onTap: () {
-          //               // Navigator.push(
-          //               //   context,
-          //               //   MaterialPageRoute(
-          //               //     builder: (context) => EditKontenPage(item),
-          //               //   ),
-          //               // );
-          //             },
-          //             child: Container(
-          //               color: Colors.blueAccent,
-          //               child: Icon(
-          //                 Icons.edit,
-          //                 color: whiteTextColor,
-          //               ),
-          //             ),
-          //           ),
-          //           SizedBox(
-          //             width: 10,
-          //           ),
-          //           GestureDetector(
-          //             onTap: () {
-          //               showDeleteDialog(item['id'], item['name']);
-          //             },
-          //             child: Container(
-          //               color: Colors.redAccent,
-          //               child: Icon(
-          //                 Icons.delete,
-          //                 color: whiteTextColor,
-          //               ),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     )
-          //   ]);
-          // }).toList(),
+    Widget kontenListTile(KontenModel konten) {
+      return Container(
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.only(
+          top: 10,
         ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(width: 1, color: Color(0xffD1D1D1)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${konten.judul}',
+                    style: blackTextStyle.copyWith(
+                        fontWeight: semiBold, fontSize: 16),
+                  ),
+                  Text(
+                    '${konten.jenis} dongeng - ${konten.user?.name}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 30,
+            ),
+            Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditKontenPage(konten, user),
+                      ),
+                    ).then((value) async {
+                      await getInit();
+                      setState(() {});
+                    });
+                  },
+                  child: Container(
+                    color: Colors.blueAccent,
+                    child: Icon(
+                      Icons.edit,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    showDeleteDialog(konten.id!,
+                            '${konten.jenis} dongeng - ${konten.judul}')
+                        .then((value) async {
+                      await getInit();
+                      setState(() {
+                        filter = '';
+                        filterStatus = false;
+                        filterInputStatus = false;
+                        filteredKonten = kontenProvider.filterKontens;
+                      });
+                    });
+                  },
+                  child: Container(
+                    color: Colors.redAccent,
+                    child: Icon(
+                      Icons.delete,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget listKonten() {
+      return Column(
+        children: filter == ''
+            ? kontenProvider.kontens
+                .map((konten) => kontenListTile(konten))
+                .toList()
+            : filteredKonten.map((konten) => kontenListTile(konten)).toList(),
       );
     }
 
@@ -328,7 +458,12 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
         width: double.infinity,
         child: ListView(
           children: [
-            tableKonten(),
+            SizedBox(
+              height: defaultMargin,
+            ),
+            // tableKonten(),
+            filterInput(),
+            listKonten(),
             SizedBox(
               height: defaultMargin,
             ),

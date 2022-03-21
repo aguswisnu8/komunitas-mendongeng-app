@@ -172,7 +172,7 @@ class _DetailKontenPageState extends State<DetailKontenPage> {
               height: 2,
             ),
             Text(
-              'Oleh: ${widget.konten.user?.name}',
+              'Pengunggah: ${widget.konten.user?.name}',
               // 'Oleh: agus wisnu dan kusuma nata',
               style: greyTextStyle,
             ),

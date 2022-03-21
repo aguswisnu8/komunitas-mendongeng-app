@@ -74,7 +74,7 @@ class _AddKontenPageState extends State<AddKontenPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Menambahkan Kegiatan Baru',
+              'Gagal Menambahkan Konten Baru',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),

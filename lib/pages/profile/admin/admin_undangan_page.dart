@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:kom_mendongeng/models/undangan_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
 import 'package:kom_mendongeng/pages/crud/edit_undangan_page.dart';
 import 'package:kom_mendongeng/providers/auth_provider.dart';
@@ -24,12 +25,15 @@ class _AdminUndanganPageState extends State<AdminUndanganPage> {
     await Provider.of<UndanganProvider>(context, listen: false).getUndangans();
   }
 
-  final List<Map> _products = List.generate(10, (i) {
-    return {"id": i, "name": "Product $i", "price": Random().nextInt(200) + 1};
-  });
-
   int _currentSortColumn = 0;
   bool _isAscending = false;
+
+  List<UndanganModel> filteredUndangan = [];
+  String filter = '';
+  bool filterStatus = false;
+  bool filterInputStatus = false;
+  String activeFilterButton = '';
+  TextEditingController filterController = TextEditingController(text: '');
 
   @override
   Widget build(BuildContext context) {
@@ -38,125 +42,302 @@ class _AdminUndanganPageState extends State<AdminUndanganPage> {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     UserModel user = authProvider.user;
 
-    Widget tableKonten() {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          columnSpacing: 30,
-          sortColumnIndex: _currentSortColumn,
-          sortAscending: _isAscending,
-          // border: ,
-          columns: [
-            DataColumn(
-              label: Text('id'),
-              onSort: (columnIndex, ascending) {
-                setState(() {
-                  _currentSortColumn = columnIndex;
-                  _isAscending = ascending;
-                  if (ascending) {
-                    undanganProvider.undangans
-                        .sort((a, b) => b.id!.toInt().compareTo(a.id!.toInt()));
-                  } else {
-                    undanganProvider.undangans
-                        .sort((a, b) => a.id!.toInt().compareTo(b.id!.toInt()));
-                  }
-                });
-              },
-            ),
-            DataColumn(label: Text('instansi')),
-            DataColumn(label: Text('kegiatan')),
-            DataColumn(label: Text('jenis')),
-            DataColumn(label: Text('user')),
-            DataColumn(label: Text('kontak')),
-            DataColumn(label: Text('status')),
-            DataColumn(label: Text('edit')),
-            // DataColumn(label: Text('id')),
-            // DataColumn(label: Text('name')),
-            // DataColumn(
-            //   label: Text('price'),
-            //   onSort: (columnIndex, ascending) {
-            //     setState(() {
-            //       _currentSortColumn = columnIndex;
-            //       _isAscending = ascending;
-            //       if (ascending) {
-            //         _products.sort((a, b) => b['price'].compareTo(a['price']));
-            //       } else {
-            //         _products.sort((a, b) => a['price'].compareTo(b['price']));
-            //       }
-            //     });
-            //   },
-            // ),
-            // DataColumn(label: Text('edit')),
-          ],
-          rows: undanganProvider.undangans.map((undangan) {
-            return DataRow(cells: [
-              DataCell(Text('${undangan.id}')),
-              DataCell(Text('${undangan.penyelenggara}')),
-              DataCell(Text('${undangan.nmKegiatan}')),
-              DataCell(Text('${undangan.jenis}')),
-              DataCell(Text('${undangan.user?.name}')),
-              DataCell(Text('${undangan.contact}')),
-              DataCell(Text('${undangan.status}')),
-              DataCell(
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EditUndanganPage(undangan, user),
-                          ),
-                        ).then((value) async {
-                          await getInit();
-                          setState(() {});
-                        });
-                      },
-                      child: Container(
-                        color: Colors.blueAccent,
-                        child: Icon(
-                          Icons.edit,
-                          color: whiteTextColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ]);
-          }).toList(),
-          // rows: _products.map((item) {
-          //   return DataRow(cells: [
-          //     DataCell(Text(item['id'].toString())),
-          //     DataCell(Text(item['name'])),
-          //     DataCell(Text(item['price'].toString())),
-          //     DataCell(
-          //       Row(
-          //         children: [
-          //           GestureDetector(
-          //             onTap: () {
-          //               // Navigator.push(
-          //               //   context,
-          //               //   MaterialPageRoute(
-          //               //     builder: (context) => EditUndanganPage(item),
-          //               //   ),
-          //               // );
-          //             },
-          //             child: Container(
-          //               color: Colors.blueAccent,
-          //               child: Icon(
-          //                 Icons.edit,
-          //                 color: whiteTextColor,
-          //               ),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     )
-          //   ]);
-          // }).toList(),
+    filterUndangan(String query) {
+      switch (filter) {
+        case 'name':
+          final result = undanganProvider.undangans.where((x) {
+            String judul = x.nmKegiatan!.toLowerCase();
+            return judul.contains(query.toLowerCase());
+          }).toList();
+          setState(() {
+            filteredUndangan = result;
+          });
+          return;
+        case 'status':
+          final result = undanganProvider.undangans
+              .where((x) => x.status == query)
+              .toList();
+          setState(() {
+            filteredUndangan = result;
+          });
+          return;
+        default:
+      }
+    }
+
+    Widget filterClearButton() {
+      return TextButton(
+        onPressed: () {
+          setState(() {
+            filter = '';
+            filterStatus = false;
+            filterInputStatus = false;
+            activeFilterButton = '';
+            filteredUndangan = undanganProvider.undangans;
+          });
+        },
+        child: Text(
+          'Clear Filter',
+          style: whiteTextStyle,
         ),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 4,
+          ),
+          backgroundColor: Colors.red[400],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+    }
+
+    Widget filterInput() {
+      return Column(
+        children: [
+          Text(
+            'List Undangan',
+            style: blackTextStyle.copyWith(
+              fontWeight: semiBold,
+              fontSize: 18,
+            ),
+          ),
+          Divider(
+            thickness: 1,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: defaultMargin),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 40,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: filterController,
+                            style: blackTextStyle,
+                            decoration: InputDecoration.collapsed(
+                                hintText: 'Cari', hintStyle: greyTextStyle),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          child: Icon(Icons.search),
+                          onTap: () {
+                            setState(() {
+                              filterInputStatus = true;
+                              filter = 'name';
+                            });
+                            filterUndangan(filterController.text);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Filter Status :',
+                style: blackTextStyle.copyWith(fontWeight: semiBold),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    filter = 'status';
+                    activeFilterButton = 'tunggu';
+                  });
+                  filterUndangan('tunggu');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: activeFilterButton == 'tunggu'
+                      ? primaryColor
+                      : greyTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'tunggu',
+                  style: whiteTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    filter = 'status';
+                    activeFilterButton = 'terima';
+                  });
+                  filterUndangan('terima');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: activeFilterButton == 'terima'
+                      ? primaryColor
+                      : greyTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'terima',
+                  style: whiteTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    filter = 'status';
+                    activeFilterButton = 'tolak';
+                  });
+                  filterUndangan('tolak');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: activeFilterButton == 'tolak'
+                      ? primaryColor
+                      : greyTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'tolak',
+                  style: whiteTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: medium,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          filter == '' ? SizedBox() : filterClearButton(),
+          Divider(
+            thickness: 1,
+          ),
+        ],
+      );
+    }
+
+    Widget listUndanganTile(UndanganModel undangan) {
+      return Container(
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.only(
+          top: 16,
+          right: 16,
+          left: 16,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(width: 1, color: Color(0xffD1D1D1)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${undangan.nmKegiatan}',
+                    style: blackTextStyle.copyWith(
+                        fontWeight: semiBold, fontSize: 16),
+                  ),
+                  Text(
+                    'Penyelenggara: ${undangan.penyelenggara}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                  Text(
+                    'Jenis Kegiatan: ${undangan.jenis}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                  Text(
+                    'Pengirim: ${undangan.user?.name}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                  Text(
+                    'Kontak: ${undangan.contact}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                  Text(
+                    'Status: ${undangan.status}',
+                    style: greyTextStyle.copyWith(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 30,
+            ),
+            Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditUndanganPage(undangan, user),
+                      ),
+                    ).then((value) async {
+                      await getInit();
+                      setState(() {});
+                    });
+                  },
+                  child: Container(
+                    color: Colors.blueAccent,
+                    child: Icon(
+                      Icons.edit,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget listUndangan() {
+      return Column(
+        children: filter == ''
+            ? undanganProvider.undangans.map((item) {
+                return listUndanganTile(item);
+              }).toList()
+            : filteredUndangan.map((item) {
+                return listUndanganTile(item);
+              }).toList(),
       );
     }
 
@@ -169,7 +350,9 @@ class _AdminUndanganPageState extends State<AdminUndanganPage> {
             SizedBox(
               height: defaultMargin,
             ),
-            tableKonten(),
+            filterInput(),
+            listUndangan(),
+            // tableKonten(),
             SizedBox(
               height: defaultMargin,
             ),

@@ -517,10 +517,7 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
                   ),
                   RadioListTile(
                     title: Text('baksos', style: blackTextStyle),
-                    subtitle: Text(
-                      'dasdads',
-                      style: greyTextStyle,
-                    ),
+                    
                     value: 'baksos',
                     groupValue: jenisKegiatan,
                     onChanged: (String? newValue) => setState(() {
@@ -712,7 +709,7 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
             ),
           ),
           child: Text(
-            'Tambah Kegiatan',
+            'Perbaharui Kegiatan',
             style: whiteTextStyle.copyWith(fontSize: 16, fontWeight: semiBold),
           ),
         ),
@@ -726,7 +723,7 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Status Aktif Akun',
+              'Tampilkan Kegiatan',
               style: blackTextStyle.copyWith(
                 fontWeight: medium,
               ),
@@ -799,7 +796,7 @@ class _EditMendongengPageState extends State<EditMendongengPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit Kegiatan Baru',
+          'Edit Kegiatan',
           style: whiteTextStyle,
         ),
         backgroundColor: primaryColor,

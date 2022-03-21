@@ -37,8 +37,7 @@ class _EditPartisipanPageState extends State<EditPartisipanPage> {
       setState(() {
         isLoading = true;
       });
-      print(
-          '${widget.partispan.id!} - $peran - ${widget.user.token}');
+      print('${widget.partispan.id!} - $peran - ${widget.user.token}');
       if (await partisipanProvider.editPartisipan(
         widget.partispan.id!,
         peran.toString(),
@@ -49,7 +48,7 @@ class _EditPartisipanPageState extends State<EditPartisipanPage> {
             duration: Duration(seconds: 1),
             backgroundColor: primaryColor,
             content: Text(
-              'Berhasil Mengubah Peran',
+              'Berhasil Memperbaharui Peran',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -62,7 +61,7 @@ class _EditPartisipanPageState extends State<EditPartisipanPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Mengubah Peran',
+              'Gagal Memperbaharui Peran',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),

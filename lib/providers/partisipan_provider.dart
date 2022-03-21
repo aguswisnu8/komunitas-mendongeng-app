@@ -21,6 +21,29 @@ class PartisipanProvider with ChangeNotifier {
     }
   }
 
+  List<PartisipanModel> getPartispanByMendongengId(int? mendongengId) {
+    List<PartisipanModel> filterPartisipan = [];
+    for (var item in partisipans) {
+      if (item.mendongengId == mendongengId) {
+        // print('fkonten masuk');
+        filterPartisipan.add(item);
+      }
+    }
+
+    return filterPartisipan;
+  }
+
+  List<PartisipanModel> getPartispanByUserId(int? userId) {
+    List<PartisipanModel> filterPartisipan = [];
+    for (var item in partisipans) {
+      if (item.userId == userId) {
+        filterPartisipan.add(item);
+      }
+    }
+
+    return filterPartisipan;
+  }
+
   Future<List> addPartisipan(
     int id,
     String peran,

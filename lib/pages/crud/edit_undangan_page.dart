@@ -74,7 +74,7 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
             duration: Duration(seconds: 1),
             backgroundColor: primaryColor,
             content: Text(
-              'Berhasil Mengubah Status Undangan',
+              'Berhasil Memperbaharui Status Undangan',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -86,7 +86,7 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Mengubah Status Undangan',
+              'Gagal Memperbaharui Status Undangan',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -310,7 +310,7 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
               ),
             ),
             child: Text(
-              'Tambah Undangan',
+              'Perbaharui Undangan',
               style:
                   whiteTextStyle.copyWith(fontSize: 16, fontWeight: semiBold),
             )),
@@ -342,7 +342,7 @@ class _EditUndanganPageState extends State<EditUndanganPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Perbaharui Status Undangan',
+          'Edit Status Undangan',
           style: whiteTextStyle,
         ),
         backgroundColor: primaryColor,

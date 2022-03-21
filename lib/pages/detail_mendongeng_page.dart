@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:kom_mendongeng/models/mendongeng_model.dart';
+import 'package:kom_mendongeng/models/partisipan_model.dart';
 import 'package:kom_mendongeng/pages/widget/loding_button.dart';
 import 'package:kom_mendongeng/providers/auth_provider.dart';
 import 'package:kom_mendongeng/providers/partisipan_provider.dart';
@@ -20,12 +21,26 @@ class DetailMendongengPage extends StatefulWidget {
 
 class _DetailMendongengPageState extends State<DetailMendongengPage> {
   bool isLoading = false;
+  bool detailPartisipan = false;
+  int detailCounter = 0;
   @override
   Widget build(BuildContext context) {
     PartisipanProvider partisipanProvider =
         Provider.of<PartisipanProvider>(context);
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     bool flag = authProvider.logged;
+
+    List<PartisipanModel> result =
+        partisipanProvider.getPartispanByMendongengId(widget.mendongeng.id);
+    int pendongeng = 0;
+    int peserta = 0;
+    for (var item in result) {
+      if (item.peran == 'pendongeng') {
+        pendongeng++;
+      } else {
+        peserta++;
+      }
+    }
 
     Future<void> loadingDialog() {
       return showDialog(
@@ -282,7 +297,6 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
                   SizedBox(
                     height: 6,
                   ),
-                  isLoading ? LoadingButton() : SizedBox(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -392,14 +406,82 @@ class _DetailMendongengPageState extends State<DetailMendongengPage> {
       );
     }
 
+    Widget daftarPartisipan() {
+      return Container(
+        margin: EdgeInsets.only(
+          left: defaultMargin,
+          right: defaultMargin,
+          bottom: 30,
+        ),
+        child: Column(
+          children: [
+            Text(
+              'Jumlah Partisipan ${result.length} \n~\nPendongeng: $pendongeng | Peserta: $peserta',
+              style: greyTextStyle.copyWith(),
+              textAlign: TextAlign.center,
+            ),
+            DataTable(
+              showBottomBorder: true,
+              columns: [
+                DataColumn(label: Text('Nama')),
+                DataColumn(label: Text('Peran')),
+              ],
+              rows: result.map((partisipan) {
+                return DataRow(cells: [
+                  DataCell(Text('${partisipan.user?.name}')),
+                  DataCell(Text('${partisipan.peran}')),
+                ]);
+              }).toList(),
+            ),
+          ],
+        ),
+
+      );
+    }
+
+    Widget buttonPartisipan() {
+      return Column(
+        children: [
+          Container(
+            child: TextButton(
+              onPressed: () {
+                print(detailCounter);
+                if (detailCounter == 0) {
+                  detailCounter = 1;
+                  setState(() {
+                    detailPartisipan = true;
+                  });
+                } else {
+                  setState(() {
+                    detailPartisipan = false;
+                    detailCounter = 0;
+                  });
+                }
+              },
+              child: Text(
+                ' ------ Cek Partisipan ------ ',
+                style: whiteTextStyle.copyWith(
+                    fontSize: 12, fontWeight: semiBold, color: primaryColor),
+              ),
+            ),
+          ),
+          detailPartisipan ? daftarPartisipan() : SizedBox()
+        ],
+      );
+    }
+
     return Scaffold(
       body: ListView(
         children: [
           header(),
           content(),
+          buttonPartisipan(),
           commingDay(widget.mendongeng.tgl.toString())
               ? buttonIkut()
               : SizedBox(),
+          SizedBox(
+            height: defaultMargin,
+          )
         ],
       ),
     );

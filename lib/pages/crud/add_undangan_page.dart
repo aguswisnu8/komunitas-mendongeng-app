@@ -86,6 +86,78 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
       });
     }
 
+    Future<void> showDetailJenis() {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => Container(
+          width: MediaQuery.of(context).size.width - (2 * defaultMargin),
+          child: AlertDialog(
+            backgroundColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(
+                        Icons.close,
+                        color: whiteTextColor,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Prosedur Undangan Bali Mendongeng',
+                    style: whiteTextStyle.copyWith(
+                      fontSize: 16,
+                      fontWeight: semiBold,
+                    ),
+                  ),
+                  Divider(
+                    thickness: 1,
+                  ),
+                  Text(
+                    '• pertama utk undangan acara non profit seperti bakti sosial, pengabdian masyarakat, kami gak kenakan biaya sama sekali, karna ini sdh mnjadi komitmen kami',
+                    style: whiteTextStyle.copyWith(
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '• kedua kalau utk undangan acara profit, seperti undangan dr Perusahaan utk di kegiatanya, km minta uang akomodasi, sekaligus utk  kas komunitas kami',
+                    style: whiteTextStyle.copyWith(
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '• ketiga kalau utk undangan ke sekolah2 kami bisa meminta sejumlah buku/alat tulis yg nanti nya akan kami sumbangkan ke adik adik yg membutuhkan. Beserta sekedar uang transpot utk anggota km yg dtg kesana nantinya',
+                    style: whiteTextStyle.copyWith(
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 6,
+                  ),
+                  isLoading ? LoadingButton() : SizedBox(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     Widget namaKegiatan() {
       return Container(
         margin: EdgeInsets.only(top: 30),
@@ -398,10 +470,37 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Jenis Kegiatan',
+              'Jenis',
               style: blackTextStyle.copyWith(
                 fontWeight: medium,
               ),
+            ),
+            SizedBox(
+              height: 6,
+            ),
+            Row(
+              // crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    showDetailJenis();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Detail Jenis Undangan',
+                      style: whiteTextStyle.copyWith(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             SizedBox(
               height: 6,
@@ -425,10 +524,10 @@ class _AddUndanganPageState extends State<AddUndanganPage> {
                   ),
                   RadioListTile(
                     title: Text('baksos', style: blackTextStyle),
-                    subtitle: Text(
-                      'dasdads',
-                      style: greyTextStyle,
-                    ),
+                    // subtitle: Text(
+                    //   'dasdads',
+                    //   style: greyTextStyle,
+                    // ),
                     value: 'baksos',
                     groupValue: jenisKegiatan,
                     onChanged: (String? newValue) => setState(() {

@@ -19,6 +19,7 @@ import 'package:kom_mendongeng/pages/profile/admin/admin_partisipan_page.dart';
 import 'package:kom_mendongeng/pages/profile/admin/admin_undangan_page.dart';
 import 'package:kom_mendongeng/pages/profile/edit_profile_page.dart';
 import 'package:kom_mendongeng/pages/profile/user_konten_page.dart';
+import 'package:kom_mendongeng/pages/profile/user_partisipasi_page.dart';
 import 'package:kom_mendongeng/pages/profile/user_undangan_page.dart';
 import 'package:kom_mendongeng/pages/profile/reset_password_page.dart';
 import 'package:kom_mendongeng/pages/splash_page.dart';
@@ -178,6 +179,7 @@ class _MyAppState extends State<MyApp> {
           '/p-resetpass': (context) => ResetPasswordPage(),
           '/p-userkonten': (context) => UserKontenPage(),
           '/p-userundangan': (context) => UserUndanganPage(),
+          '/p-userpartisipasi': (context) => UserPartisipasiPage(),
 
           // admin
           '/a-akun': (context) => AdminAkunPage(),

@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Daftar Account',
+              'Login',
               style: blackTextStyle.copyWith(
                 fontSize: 24,
                 fontWeight: semiBold,

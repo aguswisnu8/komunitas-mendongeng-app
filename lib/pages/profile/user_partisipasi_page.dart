@@ -1,58 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:kom_mendongeng/models/konten_model.dart';
+import 'package:kom_mendongeng/models/partisipan_model.dart';
 import 'package:kom_mendongeng/models/user_model.dart';
-import 'package:kom_mendongeng/pages/crud/edit_konten_page.dart';
 
 import 'package:kom_mendongeng/providers/auth_provider.dart';
-import 'package:kom_mendongeng/providers/konten_provider.dart';
+import 'package:kom_mendongeng/providers/partisipan_provider.dart';
 
 import 'package:kom_mendongeng/theme.dart';
-
 import 'package:provider/provider.dart';
 
-class UserKontenPage extends StatefulWidget {
+class UserPartisipasiPage extends StatefulWidget {
   @override
-  State<UserKontenPage> createState() => _UserKontenPageState();
+  State<UserPartisipasiPage> createState() => _UserPartisipasiPageState();
 }
 
-class _UserKontenPageState extends State<UserKontenPage> {
-  List<KontenModel> filteredKonten = [];
+class _UserPartisipasiPageState extends State<UserPartisipasiPage> {
+  @override
+  void initState() {
+    getInit();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  List<PartisipanModel> filteredPartisipasi = [];
+
+  getInit() async {
+    await Provider.of<PartisipanProvider>(context, listen: false)
+        .getPartisipans();
+  }
+
   String filter = '';
   bool filterStatus = false;
   bool filterInputStatus = false;
   String activeFilterButton = '';
-  TextEditingController filterController = TextEditingController(text: '');
 
-  getInit() async {
-    await Provider.of<KontenProvider>(context, listen: false).getKontens();
-  }
+  TextEditingController filterController = TextEditingController(text: '');
 
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     UserModel user = authProvider.user;
 
-    KontenProvider kontenProvider = Provider.of<KontenProvider>(context);
+    PartisipanProvider partisipanProvider =
+        Provider.of<PartisipanProvider>(context);
 
-    kontenProvider.getKontenByUserId(user.id);
+    List<PartisipanModel> userPartisipasi =
+        partisipanProvider.getPartispanByUserId(user.id);
 
-    filterKonten(String query) {
+    filterPartisipan(String query) {
       switch (filter) {
-        case 'judul':
-          final result = kontenProvider.filterKontens.where((x) {
-            String judul = x.judul!.toLowerCase();
-            return judul.contains(query.toLowerCase());
+        case 'peran':
+          final result = userPartisipasi.where((x) {
+            return x.peran == query;
           }).toList();
           setState(() {
-            filteredKonten = result;
+            filteredPartisipasi = result;
           });
           return;
-        case 'jenis':
-          final result = kontenProvider.filterKontens
-              .where((x) => x.jenis == query)
-              .toList();
+        case 'mendongeng':
+          final result = userPartisipasi.where((x) {
+            String mendongengName = '${x.mendongeng?.name!.toLowerCase()}';
+            return mendongengName.contains(query.toLowerCase());
+          }).toList();
           setState(() {
-            filteredKonten = result;
+            filteredPartisipasi = result;
           });
           return;
         default:
@@ -67,7 +77,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
             filterStatus = false;
             filterInputStatus = false;
             activeFilterButton = '';
-            filteredKonten = kontenProvider.kontens;
+            filteredPartisipasi = userPartisipasi;
           });
         },
         child: Text(
@@ -90,14 +100,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
     Widget filterInput() {
       return Column(
         children: [
-          Divider(
-            thickness: 1,
-          ),
-          SizedBox(
-            width: 10,
-          ),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: defaultMargin),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -116,7 +119,8 @@ class _UserKontenPageState extends State<UserKontenPage> {
                             controller: filterController,
                             style: blackTextStyle,
                             decoration: InputDecoration.collapsed(
-                                hintText: 'Cari', hintStyle: greyTextStyle),
+                                hintText: 'Cari Nama Kegiatan',
+                                hintStyle: greyTextStyle),
                           ),
                         ),
                         SizedBox(
@@ -127,9 +131,9 @@ class _UserKontenPageState extends State<UserKontenPage> {
                           onTap: () {
                             setState(() {
                               filterInputStatus = true;
-                              filter = 'judul';
+                              filter = 'mendongeng';
                             });
-                            filterKonten(filterController.text);
+                            filterPartisipan(filterController.text);
                           },
                         ),
                       ],
@@ -142,23 +146,16 @@ class _UserKontenPageState extends State<UserKontenPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Filter Jenis :',
-                style: blackTextStyle.copyWith(fontWeight: semiBold),
-              ),
-              SizedBox(
-                width: 6,
-              ),
               TextButton(
                 onPressed: () {
                   setState(() {
-                    filter = 'jenis';
-                    activeFilterButton = 'artikel';
+                    filter = 'peran';
+                    activeFilterButton = 'peserta';
                   });
-                  filterKonten('artikel');
+                  filterPartisipan('peserta');
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: activeFilterButton == 'artikel'
+                  backgroundColor: activeFilterButton == 'peserta'
                       ? primaryColor
                       : greyTextColor,
                   shape: RoundedRectangleBorder(
@@ -166,7 +163,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
                   ),
                 ),
                 child: Text(
-                  'artikel',
+                  'peserta',
                   style: whiteTextStyle.copyWith(
                     fontSize: 12,
                     fontWeight: medium,
@@ -179,13 +176,13 @@ class _UserKontenPageState extends State<UserKontenPage> {
               TextButton(
                 onPressed: () {
                   setState(() {
-                    filter = 'jenis';
-                    activeFilterButton = 'video';
+                    filter = 'peran';
+                    activeFilterButton = 'pendongeng';
                   });
-                  filterKonten('video');
+                  filterPartisipan('pendongeng');
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: activeFilterButton == 'video'
+                  backgroundColor: activeFilterButton == 'pendongeng'
                       ? primaryColor
                       : greyTextColor,
                   shape: RoundedRectangleBorder(
@@ -193,7 +190,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
                   ),
                 ),
                 child: Text(
-                  'video',
+                  'pendongeng',
                   style: whiteTextStyle.copyWith(
                     fontSize: 12,
                     fontWeight: medium,
@@ -203,9 +200,6 @@ class _UserKontenPageState extends State<UserKontenPage> {
             ],
           ),
           filter == '' ? SizedBox() : filterClearButton(),
-          Divider(
-            thickness: 1,
-          ),
         ],
       );
     }
@@ -241,9 +235,9 @@ class _UserKontenPageState extends State<UserKontenPage> {
       );
     }
 
-    deleteKonten(int id) async {
+    deletePartisipan(int id) async {
       loadingDialog();
-      if (await kontenProvider.deleteKonten(
+      if (await partisipanProvider.deletePartisipan(
         id,
         authProvider.user.token.toString(),
       )) {
@@ -252,7 +246,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.green[400],
             content: Text(
-              'Konten id: $id berhasil dihapus',
+              'Partisipan id: $id berhasil dihapus',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -264,7 +258,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Menghapus Konten id: $id',
+              'Gagal Menghapus Partisipan id: $id',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -301,7 +295,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus konten id $id',
+                    'Hapus partisipan id $id',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,
@@ -324,8 +318,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
                     child: TextButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        // print('peserta');
-                        deleteKonten(id);
+                        deletePartisipan(id);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.redAccent,
@@ -350,7 +343,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
       );
     }
 
-    Widget kontenListTile(KontenModel konten) {
+    Widget partisipasiTile(PartisipanModel partisipan) {
       return Container(
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.only(
@@ -368,12 +361,12 @@ class _UserKontenPageState extends State<UserKontenPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${konten.judul}',
+                    '${partisipan.mendongeng?.name}',
                     style: blackTextStyle.copyWith(
                         fontWeight: semiBold, fontSize: 16),
                   ),
                   Text(
-                    '${konten.jenis} dongeng - ${konten.user?.name}',
+                    '${partisipan.user?.name} sebagai ${partisipan.peran}',
                     style: greyTextStyle.copyWith(fontSize: 12),
                   ),
                 ],
@@ -386,38 +379,15 @@ class _UserKontenPageState extends State<UserKontenPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditKontenPage(konten, user),
-                      ),
-                    ).then((value) async {
-                      await getInit();
-                      setState(() {});
-                    });
-                  },
-                  child: Container(
-                    color: Colors.blueAccent,
-                    child: Icon(
-                      Icons.edit,
-                      color: whiteTextColor,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    showDeleteDialog(konten.id!,
-                            '${konten.jenis} dongeng - ${konten.judul}')
+                    showDeleteDialog(partisipan.id!,
+                            '${partisipan.user?.name} pada kegiatan ${partisipan.mendongeng?.name}')
                         .then((value) async {
                       await getInit();
                       setState(() {
                         filter = '';
                         filterStatus = false;
                         filterInputStatus = false;
-                        filteredKonten = kontenProvider.filterKontens;
+                        filteredPartisipasi = userPartisipasi;
                       });
                     });
                   },
@@ -436,35 +406,15 @@ class _UserKontenPageState extends State<UserKontenPage> {
       );
     }
 
-    Widget listKonten() {
+    Widget listPartisipasi() {
       return Column(
         children: filter == ''
-            ? kontenProvider.filterKontens
-                .map((konten) => kontenListTile(konten))
-                .toList()
-            : filteredKonten.map((konten) => kontenListTile(konten)).toList(),
-      );
-    }
-
-    Widget createButton() {
-      return Container(
-        margin: EdgeInsets.only(top: 30),
-        child: TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/add-konten');
-              // Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'Buat Konten',
-              style:
-                  whiteTextStyle.copyWith(fontSize: 14, fontWeight: semiBold),
-            )),
+            ? userPartisipasi.map((item) {
+                return partisipasiTile(item);
+              }).toList()
+            : filteredPartisipasi.map((item) {
+                return partisipasiTile(item);
+              }).toList(),
       );
     }
 
@@ -474,10 +424,24 @@ class _UserKontenPageState extends State<UserKontenPage> {
         width: double.infinity,
         child: ListView(
           children: [
-            createButton(),
+            SizedBox(
+              height: defaultMargin,
+            ),
+            Text(
+              'Berikut daftar partisipasi anda dalam kegiatan mendongeng keliling',
+              style: blackTextStyle.copyWith(fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: 10,
+            ),
             filterInput(),
-            listKonten(),
-            // tableKonten(),
+            Divider(
+              thickness: 1,
+            ),
+            // Text(
+            //     'filter status: $filterStatus - filtered: ${filteredPartisipasi.length}'),
+            listPartisipasi(),
             SizedBox(
               height: defaultMargin,
             ),
@@ -489,7 +453,7 @@ class _UserKontenPageState extends State<UserKontenPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Kelola Konten',
+          'Daftar Partisipasi',
           style: whiteTextStyle,
         ),
         backgroundColor: primaryColor,

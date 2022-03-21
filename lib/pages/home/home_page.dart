@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
               height: 12,
             ),
             Text(
-              'Melestarikan budaya mendongeng, mempopulerkan kegiatan mendongeng kembali dan selamatkan generasi adik-adik di sekitar kita dari "krisis tutur".',
+              'Melestarikan budaya mendongeng, kembali mempopulerkan kegiatan mendongeng serta menyelamatkan generasi adik-adik di sekitar kita dari "krisis tutur".',
               textAlign: TextAlign.center,
               style: whiteTextStyle.copyWith(
                 fontSize: 16,

@@ -139,7 +139,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 20,
               ),
               Text(
-                'Account',
+                'Pengelolaan Pribadi',
                 style: blackTextStyle.copyWith(
                   fontSize: 16,
                   fontWeight: semiBold,
@@ -187,6 +187,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.pushNamed(context, '/p-userundangan');
                 },
                 child: menuItem('Undangan'),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/p-userpartisipasi');
+                },
+                child: menuItem('Partisipasi Kegiatan'),
               ),
               SizedBox(
                 height: 16,
@@ -278,6 +284,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.pushNamed(context, '/daftar').then((value) async {
                   setState(() {});
                 });
+                // apiTest();
               },
               child: Text(
                 'Daftar Anggota',
@@ -375,7 +382,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future apiTest() async {
     print('test api');
-    var baseUrl = '${ApiConfig.getUrl()}/test/';
+    var baseUrl = 'http://mendongeng.rf.gd/api/kontens';
     final response = await http.get(
       Uri.parse(baseUrl),
       headers: {'Accept': 'application/json'},

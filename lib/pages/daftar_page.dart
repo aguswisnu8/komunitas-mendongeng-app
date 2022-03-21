@@ -66,7 +66,7 @@ class _DaftarPageState extends State<DaftarPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Daftar Account',
+              'Daftar Akun',
               style: blackTextStyle.copyWith(
                 fontSize: 24,
                 fontWeight: semiBold,

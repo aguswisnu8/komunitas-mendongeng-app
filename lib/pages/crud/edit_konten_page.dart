@@ -56,12 +56,16 @@ class _EditKontenPageState extends State<EditKontenPage> {
       setState(() {
         isLoading = true;
       });
-      // print(judulController.text);
-      // print(_image);
-      // print(jenisKonten);
-      // print(linkController.text);
-      // print(deskripsiController.text);
-      // print(statusKonten);
+      if (linkController.text=='null') {
+        linkController.text = 'https://youtu.be/XqZsoesa55w';
+      }
+      print(judulController.text);
+      print(_image);
+      print(jenisKonten);
+      print(linkController.text);
+      print(deskripsiController.text);
+      print(statusKonten);
+      
       if (_image != null) {
         print('ganti image');
         if (await kontenProvider.editKonten(
@@ -92,7 +96,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
               duration: Duration(seconds: 1),
               backgroundColor: Colors.redAccent,
               content: Text(
-                'Gagal Mengubah Konten',
+                'Gagal Memperbaharui Konten',
                 style: whiteTextStyle,
                 textAlign: TextAlign.center,
               ),
@@ -448,7 +452,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
               ),
             ),
             child: Text(
-              'Tambah Konten',
+              'Edit Konten',
               style:
                   whiteTextStyle.copyWith(fontSize: 16, fontWeight: semiBold),
             )),
@@ -462,7 +466,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Status Aktif Akun',
+              'Tampilkan Konten',
               style: blackTextStyle.copyWith(
                 fontWeight: medium,
               ),
@@ -480,7 +484,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
                 children: [
                   RadioListTile(
                     title: Text(
-                      'non aktif',
+                      'sembunyikan',
                       style: blackTextStyle,
                     ),
                     value: 0,
@@ -490,7 +494,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
                   ),
                   RadioListTile(
                     title: Text(
-                      'aktif',
+                      'tampilkan',
                       style: blackTextStyle,
                     ),
                     value: 1,
@@ -531,7 +535,7 @@ class _EditKontenPageState extends State<EditKontenPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Tambah Konten Baru',
+          'Edit Konten',
           style: whiteTextStyle,
         ),
         backgroundColor: primaryColor,
