@@ -76,7 +76,7 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.green[400],
             content: Text(
-              'Akun id: $id berhasil dihapus',
+              'Akun berhasil dihapus',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -88,7 +88,7 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Menghapus Akun id: $id',
+              'Gagal Menghapus Akun',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -125,7 +125,7 @@ class _AdminAkunPageState extends State<AdminAkunPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Akun id $id',
+                    'Hapus Akun',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,

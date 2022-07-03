@@ -93,7 +93,6 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
     Widget filterInput() {
       return Column(
         children: [
-          
           Divider(
             thickness: 1,
           ),
@@ -281,7 +280,7 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.green[400],
             content: Text(
-              'Kegiatan Mendongeng id: $id berhasil dihapus',
+              'Kegiatan Mendongeng berhasil dihapus',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -293,7 +292,7 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Menghapus Kegiatan Mendongeng id: $id',
+              'Gagal Menghapus Kegiatan Mendongeng',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -330,7 +329,7 @@ class _AdminMendongengPageState extends State<AdminMendongengPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Kegiatan id $id',
+                    'Hapus Kegiatan',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,

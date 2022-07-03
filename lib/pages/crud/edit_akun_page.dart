@@ -214,7 +214,8 @@ class _EditAkunPageState extends State<EditAkunPage> {
         child: TextButton(
             onPressed: () {
               // Navigator.pushNamed(context, '/home');
-              if (userLevel != widget.anggota.level) {
+              if (userLevel != widget.anggota.level ||
+                  _groupValue != widget.anggota.active) {
                 editLevelAkun();
               } else {
                 Navigator.pop(context);

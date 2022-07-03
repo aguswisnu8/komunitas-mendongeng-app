@@ -33,6 +33,37 @@ class _ProfilePageState extends State<ProfilePage> {
     //   image = user.profilePhotoPath;
     // }
 
+    Future<void> loadingDialog() {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => Container(
+          // width: MediaQuery.of(context).size.width - (4 * defaultMargin),
+          width: 200,
+          child: AlertDialog(
+            backgroundColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: defaultMargin),
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      color: whiteTextColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     Widget header() {
       return AppBar(
         backgroundColor: primaryColor,
@@ -50,6 +81,16 @@ class _ProfilePageState extends State<ProfilePage> {
                           width: 80,
                           fit: BoxFit.cover,
                           height: 80,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Color(0xffD1D1D1),
+                              child: Center(
+                                child: Text('Can\'t Load Image'),
+                              ),
+                            );
+                          },
                         ),
                       )
                     : ClipOval(
@@ -83,10 +124,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 GestureDetector(
                   onTap: () async {
+                    loadingDialog();
                     if (await authProvider
                         .logout(authProvider.user.token.toString())) {
                       setState(() {});
                     }
+                    Navigator.pop(context);
                   },
                   child: Icon(
                     Icons.exit_to_app,

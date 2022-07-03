@@ -4,7 +4,7 @@ commingDay(String dateTest) {
       now.month.toString().padLeft(2, '0') +
       '-' +
       now.day.toString().padLeft(2, '0');
-  dateNow = '2022-03-03';
+  // dateNow = '2022-03-03';
   if (dateTest.compareTo(dateNow) >= 1) {
     return true;
   } else {
@@ -53,7 +53,3 @@ cekPengalaman(String exp) {
       return 'tidak ada';
   }
 }
-
-
-
-

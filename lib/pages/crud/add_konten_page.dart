@@ -345,10 +345,6 @@ class _AddKontenPageState extends State<AddKontenPage> {
                   ),
                   RadioListTile(
                     title: Text('video dongeng', style: blackTextStyle),
-                    subtitle: Text(
-                      'dasdads',
-                      style: greyTextStyle,
-                    ),
                     value: 'video',
                     groupValue: jenisKonten,
                     onChanged: (String? newValue) => setState(() {

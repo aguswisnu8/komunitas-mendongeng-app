@@ -246,7 +246,7 @@ class _UserPartisipasiPageState extends State<UserPartisipasiPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.green[400],
             content: Text(
-              'Partisipan id: $id berhasil dihapus',
+              'Partisipan berhasil dihapus',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -258,7 +258,7 @@ class _UserPartisipasiPageState extends State<UserPartisipasiPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Menghapus Partisipan id: $id',
+              'Gagal Menghapus Partisipan',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -295,7 +295,7 @@ class _UserPartisipasiPageState extends State<UserPartisipasiPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus partisipan id $id',
+                    'Hapus partisipan',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,

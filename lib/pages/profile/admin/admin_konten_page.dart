@@ -258,7 +258,7 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.green[400],
             content: Text(
-              'Konten id: $id berhasil dihapus',
+              'Konten berhasil dihapus',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -270,7 +270,7 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Menghapus Konten id: $id',
+              'Gagal Menghapus Konten',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -307,7 +307,7 @@ class _AdminKontenPageState extends State<AdminKontenPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus konten id $id',
+                    'Hapus konten',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,

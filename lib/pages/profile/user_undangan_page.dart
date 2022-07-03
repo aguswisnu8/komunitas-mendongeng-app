@@ -292,7 +292,7 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.green[400],
             content: Text(
-              'Undangan id: $id berhasil dihapus',
+              'Undangan berhasil dihapus',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -304,7 +304,7 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
             duration: Duration(seconds: 1),
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Gagal Menghapus Undangan id: $id',
+              'Gagal Menghapus Undangan',
               style: whiteTextStyle,
               textAlign: TextAlign.center,
             ),
@@ -341,7 +341,7 @@ class _UserUndanganPageState extends State<UserUndanganPage> {
                     height: 10,
                   ),
                   Text(
-                    'Hapus Undangan id $id',
+                    'Hapus Undangan',
                     style: whiteTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semiBold,
